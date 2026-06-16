@@ -1,12 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg: #080808;
+  --surface: #111111;
+  --surface-2: #181818;
+  --border: rgba(255,255,255,0.07);
+  --border-hover: rgba(255,255,255,0.14);
+  --text-muted: #6b7280;
+  --text-secondary: #9ca3af;
+}
+
 body {
-  background: #1a1a1a;
-  color: #ffffff;
+  background: var(--bg);
+  color: #f9fafb;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 .input {
-  @apply w-full h-11 px-4 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-success;
+  @apply w-full h-11 px-4 rounded-lg text-white placeholder-gray-600 focus:outline-none transition-colors;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.input:focus {
+  border-color: rgba(16,185,129,0.5);
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.08);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.card:hover {
+  border-color: var(--border-hover);
 }
