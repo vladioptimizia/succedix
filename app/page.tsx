@@ -17,7 +17,7 @@ export default function LandingPage() {
         <div
           className="absolute inset-0 bg-no-repeat"
           style={{
-            backgroundImage: "url('/matterhorn.jpg')",
+            backgroundImage: "url('/michael-portmann-QO6BGwLiPu4-unsplash.jpg')",
             backgroundSize: 'cover',
             backgroundPosition: 'center center',
             filter: 'grayscale(100%) brightness(0.60) contrast(1.25)',
