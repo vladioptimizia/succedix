@@ -43,13 +43,7 @@ export default function SellerOnboardingPage() {
       await fetch('/api/forms/seller-readiness', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
-        body: JSON.stringify({
-          establishedYear: data.foundedYear,
-          documentationComplete: data.documentsOrganized && data.accountingUpToDate && data.licensesValid,
-          annualRevenue: data.annualRevenue,
-          recurringCustomers: data.recurringClients,
-          ownerDependency: data.ownerDependency,
-        }),
+        body: JSON.stringify(data),
       });
 
       await fetch('/api/businesses/publish', {

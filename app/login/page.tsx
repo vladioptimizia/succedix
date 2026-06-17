@@ -32,7 +32,15 @@ export default function LoginPage() {
       setLoading(false)
       return
     }
-    router.push('/discover')
+    const { data: { user } } = await supabase.auth.getUser()
+    const userType = user?.user_metadata?.user_type
+    if (userType === 'vendor') {
+      router.push('/onboarding/seller')
+    } else if (userType === 'buyer') {
+      router.push('/onboarding/buyer')
+    } else {
+      router.push('/discover')
+    }
     router.refresh()
   }
 
@@ -40,19 +48,30 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    const res = await fetch('/api/auth/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, userType, fullName }),
+
+    const { data: authData, error: signupError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName, user_type: userType } },
     })
-    const json = await res.json()
-    if (!res.ok) {
-      setError(json.error)
+
+    if (signupError) {
+      setError(signupError.message)
       setLoading(false)
       return
     }
-    setSuccess(t.login.successMsg)
-    setTab('login')
+
+    if (authData.user) {
+      await supabase.from('users').upsert({
+        id: authData.user.id,
+        email,
+        user_type: userType,
+        full_name: fullName || null,
+      })
+      router.push(userType === 'buyer' ? '/onboarding/buyer' : '/onboarding/seller')
+      router.refresh()
+    }
+
     setLoading(false)
   }
 
