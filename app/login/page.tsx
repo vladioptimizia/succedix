@@ -61,31 +61,43 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    try {
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Timeout — o Supabase não respondeu em 12s. Verifica se o projeto está ativo (não pausado).')), 12000)
+      )
+      const { data: authData, error: signupError } = await Promise.race([
+        supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { full_name: fullName, user_type: userType } },
+        }),
+        timeout,
+      ])
 
-    const { data: authData, error: signupError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: fullName, user_type: userType } },
-    })
+      if (signupError) {
+        setError(signupError.message)
+        setLoading(false)
+        return
+      }
 
-    if (signupError) {
-      setError(signupError.message)
+      if (authData.user) {
+        await supabase.from('users').upsert({
+          id: authData.user.id,
+          email,
+          user_type: userType,
+          full_name: fullName || null,
+        })
+        setSuccess('Conta criada! A redirecionar...')
+        router.push(userType === 'buyer' ? '/onboarding/buyer' : '/onboarding/seller')
+        router.refresh()
+      } else {
+        setError('Sem dados de utilizador na resposta. Verifica a confirmação de email no Supabase.')
+        setLoading(false)
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Erro inesperado ao criar conta.')
       setLoading(false)
-      return
     }
-
-    if (authData.user) {
-      await supabase.from('users').upsert({
-        id: authData.user.id,
-        email,
-        user_type: userType,
-        full_name: fullName || null,
-      })
-      router.push(userType === 'buyer' ? '/onboarding/buyer' : '/onboarding/seller')
-      router.refresh()
-    }
-
-    setLoading(false)
   }
 
   return (
