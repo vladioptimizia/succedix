@@ -67,7 +67,7 @@ export default function Footer() {
           className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 text-xs"
           style={{ borderTop: '1px solid rgba(255,255,255,0.05)', color: '#4b5563' }}
         >
-          <p>© {year} Succedix Sàrl. {t.footer.copyright}</p>
+          <p>© {year} Succedix — by Optimizia. {t.footer.copyright}</p>
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1.5">
               <span

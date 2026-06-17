@@ -54,6 +54,10 @@ export interface Translations {
     dismiss: string;
     active: string;
   };
+  betaBanner: {
+    text: string;
+    dismiss: string;
+  };
   consent: {
     title: string;
     description: string;
