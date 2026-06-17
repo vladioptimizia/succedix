@@ -41,14 +41,20 @@ export default function Footer() {
 
           <div>
             <p className="text-xs tracking-widest uppercase mb-4" style={{ color: '#4b5563' }}>Legal</p>
-            <nav className="flex flex-col gap-2.5 text-sm" style={{ color: '#6b7280' }}>
-              <Link href="/privacy" className="hover:text-white transition-colors flex items-center gap-1.5">
-                <span>🛡️</span> Privacidade de Dados
+            <div className="flex flex-col gap-3">
+              <Link
+                href="/privacy"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all hover:opacity-90"
+                style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', color: '#6ee7b7' }}
+              >
+                🛡️ Privacidade de Dados
               </Link>
-              <Link href="/privacy#cookies" className="hover:text-white transition-colors">Política de Cookies</Link>
-              <Link href="/privacy#rights" className="hover:text-white transition-colors">Os Seus Direitos</Link>
-              <Link href="mailto:privacidade@succedix.ch" className="hover:text-white transition-colors">Contactar DPO</Link>
-            </nav>
+              <nav className="flex flex-col gap-2 text-sm pl-1" style={{ color: '#6b7280' }}>
+                <Link href="/privacy#cookies" className="hover:text-white transition-colors">🍪 Política de Cookies</Link>
+                <Link href="/privacy#rights" className="hover:text-white transition-colors">✅ Os Seus Direitos</Link>
+                <Link href="mailto:privacidade@succedix.ch" className="hover:text-white transition-colors">📬 Contactar DPO</Link>
+              </nav>
+            </div>
           </div>
 
         </div>
@@ -58,7 +64,7 @@ export default function Footer() {
           style={{ borderTop: '1px solid rgba(255,255,255,0.05)', color: '#4b5563' }}
         >
           <p>© {year} Succedix Sàrl. Todos os direitos reservados.</p>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <span className="flex items-center gap-1.5">
               <span
                 className="w-1.5 h-1.5 rounded-full inline-block"
@@ -66,8 +72,12 @@ export default function Footer() {
               />
               Conforme nLPD &amp; RGPD
             </span>
-            <Link href="/privacy" className="hover:text-gray-300 transition-colors">
-              Política de Privacidade
+            <Link
+              href="/privacy"
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium transition-all hover:opacity-90"
+              style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.25)', color: '#6ee7b7' }}
+            >
+              🛡️ Privacidade de Dados
             </Link>
           </div>
         </div>
