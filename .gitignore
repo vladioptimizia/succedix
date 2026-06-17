@@ -8,3 +8,4 @@ out/
 tsconfig.tsbuildinfo
 screenshot.mjs
 screenshot*.mjs
+.claude/
