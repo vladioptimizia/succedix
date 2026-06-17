@@ -56,12 +56,8 @@ export default function DiscoverPage() {
       .select('action, businesses(id, name, city, price_min, price_max)')
       .eq('buyer_id', userId)
       .in('action', ['like', 'save']);
-
     if (data) {
-      const businesses = data
-        .map((i: any) => i.businesses)
-        .filter(Boolean) as SavedBusiness[];
-      setSavedBusinesses(businesses);
+      setSavedBusinesses(data.map((i: any) => i.businesses).filter(Boolean));
     }
   }, [supabase]);
 
@@ -73,17 +69,13 @@ export default function DiscoverPage() {
     });
     const json = await res.json();
 
-    if (res.status === 401) { setLoading(false); return; }
-
     if (res.status === 429) {
       setLimitReached(true);
       setSwipesRemaining(0);
       setLoading(false);
       return;
     }
-
     if (json.swipesRemaining !== undefined) setSwipesRemaining(json.swipesRemaining);
-
     if (!json.business) {
       setNoMore(true);
       setCard(null);
@@ -99,7 +91,6 @@ export default function DiscoverPage() {
       const userId = await getUserId();
       if (!userId) return;
 
-      // Load buyer profile from Supabase
       const { data: profile } = await supabase
         .from('buyer_profiles')
         .select('*')
@@ -107,7 +98,7 @@ export default function DiscoverPage() {
         .single();
 
       if (profile) {
-        const mapped: BuyerReadinessInput = {
+        setBuyerProfile({
           capitalMin: profile.capital_min || 0,
           capitalMax: profile.capital_max || 0,
           capitalSource: 'proprio',
@@ -121,17 +112,13 @@ export default function DiscoverPage() {
           experienceBackground: profile.experience_background || '',
           timelineMonths: profile.timeline_months || 6,
           languages: profile.languages || [],
-        };
-        setBuyerProfile(mapped);
+        });
       } else {
-        // Fall back to localStorage profile
         try {
           const raw = localStorage.getItem('succedix_buyer_profile');
           if (raw) setBuyerProfile(JSON.parse(raw));
           else setNoProfile(true);
-        } catch {
-          setNoProfile(true);
-        }
+        } catch { setNoProfile(true); }
       }
 
       await fetchSaved(userId);
@@ -140,10 +127,9 @@ export default function DiscoverPage() {
     init();
   }, []);
 
-  // Recalculate fit score when card or profile changes
   useEffect(() => {
     if (!card || !buyerProfile) return;
-    const business = {
+    const score = calculateSuccessionFitScore({
       id: card.id,
       name: card.name,
       sector: card.sector as any,
@@ -152,14 +138,12 @@ export default function DiscoverPage() {
       distanceKm: 15,
       priceMin: card.priceMin,
       priceMax: card.priceMax,
-      photos: card.photos,
       establishedYear: card.establishedYear,
+      photoUrl: '',
+      sellerReadinessScore: 0,
       tags: [],
-      description: card.description,
-      annualRevenue: card.annualRevenue,
-      operatingMargin: 0,
-    };
-    setFitScore(calculateSuccessionFitScore(business, buyerProfile));
+    }, buyerProfile);
+    setFitScore(score);
   }, [card, buyerProfile]);
 
   useEffect(() => {
@@ -171,23 +155,18 @@ export default function DiscoverPage() {
   async function handleSwipe(action: SwipeAction) {
     if (!card) return;
     const userId = await getUserId();
-
     const res = await fetch('/api/interactions/swipe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
       body: JSON.stringify({ businessId: card.id, action }),
     });
     const json = await res.json();
-
     if (res.status === 429) { setLimitReached(true); setSwipesRemaining(0); return; }
-
     if (json.swipesRemaining !== undefined) setSwipesRemaining(json.swipesRemaining);
     if (json.limitReached) setLimitReached(true);
-
     if (action === 'like') setToast('Adicionado aos salvos');
     else if (action === 'save') setToast('Guardado para depois');
     else setToast('Próximo negócio');
-
     if (action !== 'pass') fetchSaved(userId);
     if (!json.limitReached) fetchNextCard();
   }
@@ -202,17 +181,13 @@ export default function DiscoverPage() {
     <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-6 text-center">
       <h2 className="font-serif text-2xl font-bold">Complete o seu perfil primeiro</h2>
       <p className="text-sm" style={{ color: '#6b7280' }}>Precisamos saber o que procura para mostrar os melhores negócios.</p>
-      <Link href="/onboarding/buyer">
-        <Button variant="primary">Criar perfil de comprador</Button>
-      </Link>
+      <Link href="/onboarding/buyer"><Button variant="primary">Criar perfil de comprador</Button></Link>
     </div>
   );
 
   return (
     <main className="min-h-screen px-4 py-12">
       <div className="max-w-lg mx-auto flex flex-col gap-8">
-
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-serif text-2xl font-bold">Descobrir</h1>
@@ -220,21 +195,16 @@ export default function DiscoverPage() {
               {swipesRemaining} swipe{swipesRemaining !== 1 ? 's' : ''} restante{swipesRemaining !== 1 ? 's' : ''} hoje
             </p>
           </div>
-          <Link href="/" className="text-sm transition-colors" style={{ color: '#4b5563' }}>← Início</Link>
+          <Link href="/" className="text-sm" style={{ color: '#4b5563' }}>← Início</Link>
         </div>
 
-        {/* Progress bar */}
         <div className="h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
           <div
             className="h-full rounded-full transition-all"
-            style={{
-              width: `${((DAILY_LIMIT - swipesRemaining) / DAILY_LIMIT) * 100}%`,
-              background: 'linear-gradient(90deg, #10b981, #34d399)',
-            }}
+            style={{ width: `${((DAILY_LIMIT - swipesRemaining) / DAILY_LIMIT) * 100}%`, background: 'linear-gradient(90deg, #10b981, #34d399)' }}
           />
         </div>
 
-        {/* Card + Actions */}
         {!limitReached && !noMore && card ? (
           <div className="flex flex-col items-center gap-5">
             <SwipeCard
@@ -247,68 +217,36 @@ export default function DiscoverPage() {
                 distanceKm: 15,
                 priceMin: card.priceMin,
                 priceMax: card.priceMax,
-                photos: card.photos,
                 establishedYear: card.establishedYear,
+                photoUrl: '',
+                sellerReadinessScore: 0,
                 tags: [],
-                description: card.description,
-                annualRevenue: card.annualRevenue,
-                operatingMargin: 0,
               }}
               fitScore={fitScore}
             />
             <div className="flex items-center gap-3 w-full max-w-sm">
-              <button
-                onClick={() => handleSwipe('pass')}
-                className="flex-1 h-12 rounded-full text-sm font-medium transition-all"
-                style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}
-              >
-                ← Passar
-              </button>
-              <button
-                onClick={() => handleSwipe('like')}
-                className="flex-1 h-12 rounded-full text-sm font-medium transition-all"
-                style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', color: '#34d399' }}
-              >
-                ♡ Like
-              </button>
-              <button
-                onClick={() => handleSwipe('save')}
-                className="h-12 px-4 rounded-full text-sm font-medium transition-all"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }}
-              >
-                📌
-              </button>
+              <button onClick={() => handleSwipe('pass')} className="flex-1 h-12 rounded-full text-sm font-medium" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}>← Passar</button>
+              <button onClick={() => handleSwipe('like')} className="flex-1 h-12 rounded-full text-sm font-medium" style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', color: '#34d399' }}>♡ Like</button>
+              <button onClick={() => handleSwipe('save')} className="h-12 px-4 rounded-full text-sm font-medium" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }}>📌</button>
             </div>
           </div>
         ) : (
-          <div
-            className="rounded-2xl p-10 flex flex-col items-center gap-4 text-center"
-            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}
-          >
+          <div className="rounded-2xl p-10 flex flex-col items-center gap-4 text-center" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
             <span className="text-4xl">{limitReached ? '⏳' : '🎉'}</span>
-            <h2 className="font-serif text-xl font-semibold">
-              {limitReached ? 'Limite diário atingido' : 'Sem mais negócios'}
-            </h2>
+            <h2 className="font-serif text-xl font-semibold">{limitReached ? 'Limite diário atingido' : 'Sem mais negócios'}</h2>
             <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
-              {limitReached
-                ? 'Volte amanhã ou faça upgrade para swipes ilimitados.'
-                : 'Não há mais negócios disponíveis no momento. Novos negócios são adicionados regularmente.'}
+              {limitReached ? 'Volte amanhã ou faça upgrade para swipes ilimitados.' : 'Não há mais negócios disponíveis. Novos negócios são adicionados regularmente.'}
             </p>
             {limitReached && <Button variant="primary" className="mt-2">Upgrade — CHF 24/mês</Button>}
           </div>
         )}
 
-        {/* Saved */}
         {savedBusinesses.length > 0 && (
           <section>
             <p className="text-xs tracking-widest uppercase mb-4" style={{ color: '#4b5563' }}>Salvos ({savedBusinesses.length})</p>
             <div className="flex flex-col gap-2">
               {savedBusinesses.map((b, i) => (
-                <div
-                  key={b.id ?? i}
-                  className="px-4 py-3 rounded-xl flex items-center justify-between text-sm"
-                  style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}
-                >
+                <div key={b.id ?? i} className="px-4 py-3 rounded-xl flex items-center justify-between text-sm" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
                   <span className="font-medium">{b.name}</span>
                   <span style={{ color: '#4b5563' }}>{b.city} · CHF {((b.price_min || 0) / 1000).toFixed(0)}k</span>
                 </div>
@@ -318,18 +256,8 @@ export default function DiscoverPage() {
         )}
       </div>
 
-      {/* Toast */}
       {toast && (
-        <div
-          className="fixed bottom-8 left-1/2 -translate-x-1/2 text-sm px-5 py-2.5 rounded-full"
-          style={{
-            background: 'rgba(17,17,17,0.95)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            backdropFilter: 'blur(12px)',
-            color: '#e5e7eb',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
-          }}
-        >
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 text-sm px-5 py-2.5 rounded-full" style={{ background: 'rgba(17,17,17,0.95)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)', color: '#e5e7eb', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
           {toast}
         </div>
       )}
