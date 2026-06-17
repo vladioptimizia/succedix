@@ -33,7 +33,7 @@ export default function LandingPage() {
           {t.hero.badge}
         </span>
 
-        <h1 className="font-serif text-5xl md:text-7xl font-bold max-w-3xl leading-tight" style={{ letterSpacing: '-0.02em' }}>
+        <h1 className="font-serif text-4xl md:text-7xl font-bold max-w-3xl leading-tight" style={{ letterSpacing: '-0.02em' }}>
           {t.hero.headline1}
           <br />
           <span style={{ background: 'linear-gradient(135deg, #10b981, #34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{t.hero.headline2}</span>
@@ -45,17 +45,17 @@ export default function LandingPage() {
           <span className="text-gray-300 font-medium">{t.hero.highlight}</span>
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-3 mt-2">
+        <div className="flex flex-col sm:flex-row gap-3 mt-2 w-full sm:w-auto">
           <Link
             href="/onboarding/buyer"
-            className="h-12 px-8 rounded-full font-medium text-sm flex items-center justify-center gap-2 transition-all"
+            className="h-12 px-8 rounded-full font-medium text-sm flex items-center justify-center gap-2 transition-all w-full sm:w-auto"
             style={{ background: '#10b981', color: '#fff', boxShadow: '0 0 24px rgba(16,185,129,0.3)' }}
           >
             {t.hero.ctaBuy}
           </Link>
           <Link
             href="/onboarding/seller"
-            className="h-12 px-8 rounded-full font-medium text-sm flex items-center justify-center gap-2 transition-all"
+            className="h-12 px-8 rounded-full font-medium text-sm flex items-center justify-center gap-2 transition-all w-full sm:w-auto"
             style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#e5e7eb' }}
           >
             {t.hero.ctaSell}
@@ -70,6 +70,50 @@ export default function LandingPage() {
         </div>
 
         <p className="text-gray-600 text-xs mt-1">{t.hero.freeSwipes}</p>
+        </div>
+      </section>
+
+      {/* ─── KATEGORIEN ─── */}
+      <section className="px-4 md:px-6 py-16" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="max-w-5xl mx-auto">
+          <p className="text-center text-xs tracking-widest uppercase text-gray-500 mb-3">Branchen</p>
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-center mb-8">Kategorien</h2>
+          {/* Mobile: horizontal scroll. Desktop: grid */}
+          <div className="flex md:hidden gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x">
+            {CATEGORIES.map((cat) => (
+              <CategoryPill key={cat.label} icon={cat.icon} label={cat.label} count={cat.count} />
+            ))}
+          </div>
+          <div className="hidden md:grid grid-cols-4 gap-3">
+            {CATEGORIES.map((cat) => (
+              <CategoryPill key={cat.label} icon={cat.icon} label={cat.label} count={cat.count} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── AUSGEWÄHLTE INSERATE ─── */}
+      <section className="px-4 md:px-6 py-16" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <p className="text-xs tracking-widest uppercase text-gray-500 mb-2">Marktplatz</p>
+              <h2 className="font-serif text-2xl md:text-3xl font-bold">Ausgewählte Möglichkeiten</h2>
+            </div>
+            <Link href="/discover" className="text-sm font-medium hidden sm:block" style={{ color: '#10b981' }}>
+              Alle ansehen →
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+            {FEATURED_BUSINESSES.map((biz) => (
+              <FeaturedBusinessCard key={biz.name} {...biz} />
+            ))}
+          </div>
+          <div className="mt-6 text-center sm:hidden">
+            <Link href="/discover" className="text-sm font-medium" style={{ color: '#10b981' }}>
+              Alle ansehen →
+            </Link>
+          </div>
         </div>
       </section>
 
