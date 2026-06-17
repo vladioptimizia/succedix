@@ -18,12 +18,12 @@ export default function LandingPage() {
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1600&q=80&auto=format&fit=crop')",
-            filter: 'grayscale(100%) brightness(0.30) contrast(1.2)',
-            backgroundPosition: 'center 30%',
+            filter: 'grayscale(100%) brightness(0.55) contrast(1.3)',
+            backgroundPosition: 'center 20%',
           }}
         />
         {/* green tint overlay */}
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(16,185,129,0.10), transparent), linear-gradient(to bottom, rgba(8,8,8,0.2) 0%, rgba(8,8,8,0.7) 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(16,185,129,0.06), transparent), linear-gradient(to bottom, rgba(8,8,8,0.1) 0%, rgba(8,8,8,0.75) 100%)' }} />
         {/* content sits above overlays */}
         <div className="relative z-10 flex flex-col items-center gap-8 w-full">
         <span
