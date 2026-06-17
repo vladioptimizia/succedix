@@ -6,9 +6,8 @@ import Button from '@/components/Button';
 import SwipeCard from '@/components/SwipeCard';
 import { createClient } from '@/lib/supabase/browser';
 import { calculateSuccessionFitScore } from '@/lib/scoring';
-import { BuyerReadinessInput, SwipeAction } from '@/lib/types';
-
-const DAILY_LIMIT = 5;
+import { BuyerReadinessInput, Canton, Sector, SwipeAction } from '@/lib/types';
+import { SWIPES_PER_DAY as DAILY_LIMIT } from '@/lib/constants';
 
 interface CardData {
   id: string;
@@ -57,7 +56,15 @@ export default function DiscoverPage() {
       .eq('buyer_id', userId)
       .in('action', ['like', 'save']);
     if (data) {
-      setSavedBusinesses(data.map((i: any) => i.businesses).filter(Boolean));
+      // Supabase returns related records as arrays; flatten and deduplicate by id
+      const seen = new Set<string>();
+      const businesses: SavedBusiness[] = [];
+      for (const row of data as { businesses: SavedBusiness[] }[]) {
+        for (const b of row.businesses ?? []) {
+          if (b && !seen.has(b.id)) { seen.add(b.id); businesses.push(b); }
+        }
+      }
+      setSavedBusinesses(businesses);
     }
   }, [supabase]);
 
@@ -132,8 +139,8 @@ export default function DiscoverPage() {
     const score = calculateSuccessionFitScore({
       id: card.id,
       name: card.name,
-      sector: card.sector as any,
-      canton: card.canton as any,
+      sector: card.sector as Sector,
+      canton: card.canton as Canton,
       city: card.city,
       distanceKm: 15,
       priceMin: card.priceMin,

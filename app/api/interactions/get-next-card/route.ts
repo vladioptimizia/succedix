@@ -1,23 +1,16 @@
-import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/server';
+import { SWIPES_PER_DAY } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
-const SWIPES_PER_DAY = 5;
-
 export async function GET(req: NextRequest) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
   const userId = req.headers.get('x-user-id');
+  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  if (!userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  // Check daily swipe limit
+  const supabase = createAdminClient();
   const today = new Date().toISOString().split('T')[0];
+
   const { data: counterData } = await supabase
     .from('swipe_counters')
     .select('count')
@@ -25,7 +18,7 @@ export async function GET(req: NextRequest) {
     .eq('date_counter', today)
     .single();
 
-  const currentCount = counterData?.count || 0;
+  const currentCount = counterData?.count ?? 0;
   const swipesRemaining = Math.max(0, SWIPES_PER_DAY - currentCount);
 
   if (swipesRemaining === 0) {
@@ -35,24 +28,22 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  // Get buyer profile for region filtering
   const { data: buyerProfile } = await supabase
     .from('buyer_profiles')
-    .select('*')
+    .select('region_main, sectors_interested')
     .eq('user_id', userId)
     .single();
 
-  // Get already seen business IDs
   const { data: interactions } = await supabase
     .from('interactions')
     .select('business_id')
     .eq('buyer_id', userId);
 
-  const seenIds = interactions?.map((i) => i.business_id) || [];
+  const seenIds = interactions?.map((i) => i.business_id) ?? [];
 
   let query = supabase
     .from('businesses')
-    .select('*')
+    .select('id, name, sector, canton, city, price_min, price_max, photos, established_year, description, annual_revenue')
     .eq('status', 'approved');
 
   if (seenIds.length > 0) {
@@ -77,13 +68,13 @@ export async function GET(req: NextRequest) {
       name: nextCard.name,
       sector: nextCard.sector,
       canton: nextCard.canton,
-      city: nextCard.city || '',
+      city: nextCard.city ?? '',
       priceMin: nextCard.price_min,
       priceMax: nextCard.price_max,
-      photos: nextCard.photos || [],
+      photos: nextCard.photos ?? [],
       establishedYear: nextCard.established_year,
-      description: nextCard.description || '',
-      annualRevenue: nextCard.annual_revenue || 0,
+      description: nextCard.description ?? '',
+      annualRevenue: nextCard.annual_revenue ?? 0,
     },
   });
 }

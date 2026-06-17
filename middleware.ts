@@ -5,7 +5,12 @@ const PROTECTED = ['/discover', '/admin', '/sell']
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  let supabaseResponse = NextResponse.next({ request })
+
+  // Always strip client-supplied x-user-id to prevent spoofing
+  const cleanHeaders = new Headers(request.headers)
+  cleanHeaders.delete('x-user-id')
+
+  let supabaseResponse = NextResponse.next({ request: { headers: cleanHeaders } })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,8 +19,8 @@ export async function middleware(request: NextRequest) {
       cookies: {
         getAll() { return request.cookies.getAll() },
         setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({ request })
+          cookiesToSet.forEach(({ name, value }) => cleanHeaders.set(`cookie`, `${name}=${value}`))
+          supabaseResponse = NextResponse.next({ request: { headers: cleanHeaders } })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           )
@@ -27,9 +32,9 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (user) {
-    const newHeaders = new Headers(request.headers)
-    newHeaders.set('x-user-id', user.id)
-    const response = NextResponse.next({ request: { headers: newHeaders } })
+    const authedHeaders = new Headers(cleanHeaders)
+    authedHeaders.set('x-user-id', user.id)
+    const response = NextResponse.next({ request: { headers: authedHeaders } })
     supabaseResponse.cookies.getAll().forEach(c => response.cookies.set(c.name, c.value))
     return response
   }
@@ -42,5 +47,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 }

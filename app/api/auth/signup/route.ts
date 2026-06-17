@@ -1,19 +1,25 @@
-import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/server';
+import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
 
+const SignupSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  userType: z.enum(['buyer', 'vendor']),
+  fullName: z.string().min(1).optional(),
+});
+
 export async function POST(req: NextRequest) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
-  const { email, password, userType, fullName } = await req.json();
-
-  if (!email || !password || !userType || !['buyer', 'vendor', 'admin'].includes(userType)) {
-    return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
+  const body = await req.json();
+  const parsed = SignupSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
   }
+
+  const { email, password, userType, fullName } = parsed.data;
+  const supabase = createAdminClient();
 
   const { data: authData, error: authError } = await supabase.auth.admin.createUser({
     email,
@@ -27,12 +33,7 @@ export async function POST(req: NextRequest) {
 
   const { error: insertError } = await supabase
     .from('users')
-    .insert([{
-      id: authData.user!.id,
-      email,
-      user_type: userType,
-      full_name: fullName,
-    }]);
+    .insert([{ id: authData.user!.id, email, user_type: userType, full_name: fullName ?? null }]);
 
   if (insertError) {
     return NextResponse.json({ error: insertError.message }, { status: 400 });
