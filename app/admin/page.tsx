@@ -1,153 +1,182 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/browser'
-import { useTranslation } from '@/lib/i18n/LocaleContext'
 
 interface Business {
   id: string
   name: string
   sector: string
   canton: string
-  city: string
-  price_min: number
-  price_max: number
-  annual_revenue: number
+  status: string
   created_at: string
-  vendor_id: string
 }
 
-export default function AdminPage() {
-  const { t } = useTranslation()
-  const [businesses, setBusinesses] = useState<Business[]>([])
+interface Stats {
+  total: number
+  pending: number
+  buyers: number
+  matches: number
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const styles: Record<string, { bg: string; color: string; border: string }> = {
+    imported: { bg: 'rgba(107,114,128,0.1)', color: '#9ca3af', border: 'rgba(107,114,128,0.2)' },
+    pending_review: { bg: 'rgba(245,158,11,0.1)', color: '#fbbf24', border: 'rgba(245,158,11,0.2)' },
+    approved: { bg: 'rgba(16,185,129,0.1)', color: '#34d399', border: 'rgba(16,185,129,0.2)' },
+    rejected: { bg: 'rgba(239,68,68,0.1)', color: '#f87171', border: 'rgba(239,68,68,0.2)' },
+    published: { bg: 'rgba(59,130,246,0.1)', color: '#60a5fa', border: 'rgba(59,130,246,0.2)' },
+  }
+  const s = styles[status] ?? styles.imported
+  return (
+    <span
+      className="text-xs px-2 py-0.5 rounded-full"
+      style={{ background: s.bg, color: s.color, border: `1px solid ${s.border}` }}
+    >
+      {status.replace('_', ' ')}
+    </span>
+  )
+}
+
+export default function AdminOverviewPage() {
+  const [stats, setStats] = useState<Stats>({ total: 0, pending: 0, buyers: 0, matches: 0 })
+  const [recent, setRecent] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
-  const [forbidden, setForbidden] = useState(false)
-  const [actionLoading, setActionLoading] = useState<string | null>(null)
-  const supabase = createClient()
+  const [error, setError] = useState<string | null>(null)
 
-  async function fetchPending() {
-    const { data: { session } } = await supabase.auth.getSession()
-    const res = await fetch('/api/admin/businesses', {
-      headers: { 'x-user-id': session?.user.id ?? '' },
-    })
-    if (res.status === 403) { setForbidden(true); setLoading(false); return }
-    const json = await res.json()
-    setBusinesses(json.businesses ?? [])
-    setLoading(false)
-  }
+  useEffect(() => {
+    async function load() {
+      try {
+        const supabase = createClient()
 
-  useEffect(() => { fetchPending() }, [])
+        const [totalRes, pendingRes, buyersRes, matchesRes, recentRes] = await Promise.all([
+          supabase.from('businesses').select('id', { count: 'exact', head: true }),
+          supabase.from('businesses').select('id', { count: 'exact', head: true }).in('status', ['pending_review', 'imported']),
+          supabase.from('users').select('id', { count: 'exact', head: true }).eq('user_type', 'buyer'),
+          supabase.from('interactions').select('id', { count: 'exact', head: true }),
+          supabase.from('businesses').select('id,name,sector,canton,status,created_at').order('created_at', { ascending: false }).limit(10),
+        ])
 
-  async function approve(id: string) {
-    setActionLoading(id)
-    const { data: { session } } = await supabase.auth.getSession()
-    await fetch(`/api/admin/businesses/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-user-id': session?.user.id ?? '' },
-      body: JSON.stringify({ status: 'approved' }),
-    })
-    setBusinesses(prev => prev.filter(b => b.id !== id))
-    setActionLoading(null)
-  }
+        setStats({
+          total: totalRes.count ?? 0,
+          pending: pendingRes.count ?? 0,
+          buyers: buyersRes.count ?? 0,
+          matches: matchesRes.count ?? 0,
+        })
+        setRecent((recentRes.data ?? []) as Business[])
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Unknown error')
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
 
-  async function reject(id: string) {
-    setActionLoading(id)
-    const { data: { session } } = await supabase.auth.getSession()
-    await fetch(`/api/admin/businesses/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-user-id': session?.user.id ?? '' },
-      body: JSON.stringify({ status: 'archived' }),
-    })
-    setBusinesses(prev => prev.filter(b => b.id !== id))
-    setActionLoading(null)
-  }
+  const statCards = [
+    { label: 'Total Businesses', value: stats.total, color: '#ffffff' },
+    { label: 'Pending Review', value: stats.pending, color: '#fbbf24' },
+    { label: 'Active Buyers', value: stats.buyers, color: '#60a5fa' },
+    { label: 'Total Matches', value: stats.matches, color: '#10b981' },
+  ]
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-2 border-success border-t-transparent animate-spin" />
-    </div>
-  )
-
-  if (forbidden) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <p className="text-2xl font-serif font-bold mb-2">{t.admin.accessDenied}</p>
-        <p className="text-sm" style={{ color: '#6b7280' }}>{t.admin.accessDeniedDesc}</p>
+  if (loading) {
+    return (
+      <div className="p-8">
+        <div className="mb-8">
+          <div className="h-4 w-24 rounded animate-pulse mb-2" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="h-8 w-48 rounded animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {[1,2,3,4].map(i => (
+            <div key={i} className="rounded-2xl p-6 animate-pulse" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', height: '120px' }} />
+          ))}
+        </div>
+        <div className="rounded-2xl animate-pulse" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', height: '300px' }} />
       </div>
-    </div>
-  )
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="p-8">
+        <div className="rounded-2xl p-8" style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.1)' }}>
+          <p className="text-sm" style={{ color: '#f87171' }}>Error loading dashboard: {error}</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <main className="min-h-screen px-6 py-12">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <p className="text-xs tracking-widest uppercase mb-1" style={{ color: '#4b5563' }}>{t.admin.subtitle}</p>
-          <h1 className="font-serif text-3xl font-bold">{t.admin.title}</h1>
-          <p className="mt-1 text-sm" style={{ color: '#6b7280' }}>
-            {businesses.length} {t.admin.pendingCount}
-          </p>
+    <div className="p-8">
+      {/* Header */}
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <p className="text-xs tracking-widest uppercase mb-1" style={{ color: '#4b5563' }}>Admin Panel</p>
+          <h1 className="font-serif text-3xl font-bold">Overview</h1>
+          <p className="mt-1 text-sm" style={{ color: '#6b7280' }}>Succedix platform dashboard</p>
         </div>
+        <Link
+          href="/admin/import-queue"
+          className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all hover:opacity-90"
+          style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', color: '#34d399' }}
+        >
+          Process Queue
+        </Link>
+      </div>
 
-        {businesses.length === 0 ? (
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {statCards.map((card) => (
           <div
-            className="rounded-2xl p-12 flex flex-col items-center gap-3 text-center"
-            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}
+            key={card.label}
+            className="rounded-2xl p-6"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
           >
-            <span className="text-4xl">✓</span>
-            <p className="font-medium">{t.admin.noPending}</p>
-            <p className="text-sm" style={{ color: '#6b7280' }}>{t.admin.noPendingDesc}</p>
+            <p className="text-xs mb-3" style={{ color: '#6b7280' }}>{card.label}</p>
+            <p className="text-3xl font-bold" style={{ color: card.color }}>{card.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Recent activity */}
+      <div
+        className="rounded-2xl overflow-hidden"
+        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+      >
+        <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <h2 className="font-semibold text-sm">Recent Businesses</h2>
+        </div>
+        {recent.length === 0 ? (
+          <div className="p-12 text-center">
+            <p className="text-sm" style={{ color: '#6b7280' }}>No businesses yet</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
-            {businesses.map((b) => (
-              <div
-                key={b.id}
-                className="rounded-xl p-5 flex items-start justify-between gap-4"
-                style={{ background: '#111111', border: '1px solid rgba(255,255,255,0.07)' }}
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h2 className="font-semibold">{b.name}</h2>
-                    <span
-                      className="text-xs px-2 py-0.5 rounded-full"
-                      style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', color: '#fbbf24' }}
-                    >
-                      ausstehend
-                    </span>
-                  </div>
-                  <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-sm" style={{ color: '#6b7280' }}>
-                    <span>{b.sector}</span>
-                    <span>{b.city}, {b.canton}</span>
-                    <span>CHF {(b.price_min / 1000).toFixed(0)}k – {(b.price_max / 1000).toFixed(0)}k</span>
-                    {b.annual_revenue > 0 && <span>{t.admin.revenue} {(b.annual_revenue / 1000).toFixed(0)}k</span>}
-                  </div>
-                  <p className="text-xs mt-1" style={{ color: '#374151' }}>
-                    {t.admin.submitted} {new Date(b.created_at).toLocaleDateString('de-CH')}
-                  </p>
-                </div>
-                <div className="flex gap-2 flex-shrink-0">
-                  <button
-                    onClick={() => reject(b.id)}
-                    disabled={actionLoading === b.id}
-                    className="h-9 px-4 rounded-full text-xs font-medium transition-all"
-                    style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}
-                  >
-                    {t.admin.reject}
-                  </button>
-                  <button
-                    onClick={() => approve(b.id)}
-                    disabled={actionLoading === b.id}
-                    className="h-9 px-4 rounded-full text-xs font-medium transition-all"
-                    style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', color: '#34d399' }}
-                  >
-                    {actionLoading === b.id ? t.admin.loading : t.admin.approve}
-                  </button>
-                </div>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                  {['Name', 'Sector', 'Canton', 'Status', 'Created'].map(h => (
+                    <th key={h} className="text-left px-6 py-3 text-xs font-medium uppercase tracking-wider" style={{ color: '#4b5563' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {recent.map((b) => (
+                  <tr key={b.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                    <td className="px-6 py-3 text-sm font-medium">{b.name}</td>
+                    <td className="px-6 py-3 text-sm" style={{ color: '#6b7280' }}>{b.sector}</td>
+                    <td className="px-6 py-3 text-sm" style={{ color: '#6b7280' }}>{b.canton}</td>
+                    <td className="px-6 py-3"><StatusBadge status={b.status} /></td>
+                    <td className="px-6 py-3 text-sm" style={{ color: '#6b7280' }}>{new Date(b.created_at).toLocaleDateString('de-CH')}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
-    </main>
+    </div>
   )
 }
