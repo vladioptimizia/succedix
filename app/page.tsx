@@ -17,7 +17,7 @@ export default function LandingPage() {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1530549387789-4c1017266635?w=1600&q=80&auto=format&fit=crop')",
+            backgroundImage: "url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80&auto=format&fit=crop')",
             filter: 'grayscale(40%) brightness(0.35)',
           }}
         />
