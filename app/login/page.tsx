@@ -26,22 +26,35 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) {
-      setError(error.message)
+    try {
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Timeout — o servidor demorou demasiado a responder. Tenta novamente.')), 15000)
+      )
+      const { data, error } = await Promise.race([
+        supabase.auth.signInWithPassword({ email, password }),
+        timeout,
+      ])
+      if (error) {
+        setError(error.message)
+        setLoading(false)
+        return
+      }
+      const userType = data.user?.user_metadata?.user_type
+      // Admin vai direto para o painel
+      if (data.user?.email === 'vladimir.m.f95@gmail.com') {
+        router.push('/admin')
+      } else if (userType === 'vendor') {
+        router.push('/onboarding/seller')
+      } else if (userType === 'buyer') {
+        router.push('/onboarding/buyer')
+      } else {
+        router.push('/discover')
+      }
+      router.refresh()
+    } catch (err: any) {
+      setError(err?.message || 'Erro inesperado ao entrar.')
       setLoading(false)
-      return
     }
-    const { data: { user } } = await supabase.auth.getUser()
-    const userType = user?.user_metadata?.user_type
-    if (userType === 'vendor') {
-      router.push('/onboarding/seller')
-    } else if (userType === 'buyer') {
-      router.push('/onboarding/buyer')
-    } else {
-      router.push('/discover')
-    }
-    router.refresh()
   }
 
   async function handleSignup(e: React.FormEvent) {
