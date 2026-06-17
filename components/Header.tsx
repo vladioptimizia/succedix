@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import { useTranslation, Locale } from "@/lib/i18n/LocaleContext";
+import { useTranslation } from "@/lib/i18n/LocaleContext";
 
 export default function Header() {
   const { t, locale, switchLocale } = useTranslation();
@@ -11,28 +11,18 @@ export default function Header() {
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="font-serif text-xl font-semibold tracking-tight flex items-center gap-2">
           Succedix<span className="text-success">.</span>
-          <span className="text-base" title="Plataforma exclusiva para a Suíça">🇨🇭</span>
+          <span className="text-base" title="Exklusive Plattform für die Schweiz">🇨🇭</span>
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm text-gray-400">
-          <Link href="/#como-funciona" className="hover:text-white transition-colors">{t.nav.howItWorks}</Link>
+          <Link href="/#wie-es-funktioniert" className="hover:text-white transition-colors">{t.nav.howItWorks}</Link>
           <Link href="/onboarding/seller" className="hover:text-white transition-colors">{t.nav.sell}</Link>
           <Link href="/onboarding/buyer" className="hover:text-white transition-colors">{t.nav.buy}</Link>
         </nav>
-        <div className="flex items-center gap-4">
-          {/* Language toggle */}
+        <div className="flex items-center gap-3">
           <div className="flex items-center gap-1 text-xs font-medium">
-            {(['de', 'en'] as Locale[]).map((loc, i) => (
-              <span key={loc} className="flex items-center gap-1">
-                {i > 0 && <span style={{ color: '#374151' }}>|</span>}
-                <button
-                  onClick={() => switchLocale(loc)}
-                  className="transition-colors"
-                  style={{ color: locale === loc ? '#10b981' : '#6b7280', fontWeight: locale === loc ? 600 : 400 }}
-                >
-                  {loc.toUpperCase()}
-                </button>
-              </span>
-            ))}
+            <button onClick={() => switchLocale('de')} className={locale === 'de' ? 'text-emerald-500 font-semibold' : 'text-gray-400'}>DE</button>
+            <span className="text-gray-300">|</span>
+            <button onClick={() => switchLocale('en')} className={locale === 'en' ? 'text-emerald-500 font-semibold' : 'text-gray-400'}>EN</button>
           </div>
           <Link href="/login" className="text-sm text-gray-300 hover:text-white transition-colors px-4 h-9 flex items-center">
             {t.nav.login}

@@ -4,22 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Button from '@/components/Button'
 import { createClient } from '@/lib/supabase/browser'
+import { useTranslation } from '@/lib/i18n/LocaleContext'
 
-const SECTORS = [
-  { value: 'cafe', label: 'Café' },
-  { value: 'restaurante', label: 'Restaurante' },
-  { value: 'varejo', label: 'Varejo' },
-  { value: 'servicos', label: 'Serviços' },
-  { value: 'saude', label: 'Saúde' },
-  { value: 'outro', label: 'Outro' },
-]
-
-const STEPS = [
-  { label: 'Identificação', desc: 'Nome e sector do negócio' },
-  { label: 'Localização', desc: 'Onde está o negócio' },
-  { label: 'Financeiro', desc: 'Preço e receitas' },
-  { label: 'Descrição', desc: 'Contexto para compradores' },
-]
+const SECTOR_VALUES = ['cafe', 'restaurante', 'varejo', 'servicos', 'saude', 'outro']
 
 interface FormData {
   name: string
@@ -41,6 +28,8 @@ const initial: FormData = {
 
 export default function SellPage() {
   const router = useRouter()
+  const { t } = useTranslation()
+  const STEPS = t.sell.steps
   const [step, setStep] = useState(0)
   const [data, setData] = useState<FormData>(initial)
   const [loading, setLoading] = useState(false)
@@ -80,57 +69,55 @@ export default function SellPage() {
           <path d="M6 14l6 6L22 8" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </div>
-      <h1 className="font-serif text-3xl font-bold text-center">Negócio submetido!</h1>
+      <h1 className="font-serif text-3xl font-bold text-center">{t.sell.success.title}</h1>
       <p className="text-center max-w-sm leading-relaxed" style={{ color: '#6b7280' }}>
-        Recebemos a sua submissão. A nossa equipa irá rever e aprovar em até 48 horas.
+        {t.sell.success.desc}
       </p>
-      <Button variant="primary" onClick={() => router.push('/')}>Voltar ao início</Button>
+      <Button variant="primary" onClick={() => router.push('/')}>{t.sell.success.back}</Button>
     </div>
   )
 
   return (
     <div className="min-h-screen flex">
-      {/* Sidebar */}
       <aside
         className="hidden md:flex w-72 flex-col gap-2 p-8 pt-12 flex-shrink-0"
         style={{ background: 'rgba(255,255,255,0.02)', borderRight: '1px solid rgba(255,255,255,0.05)' }}
       >
-        <p className="text-xs tracking-widest uppercase mb-6" style={{ color: '#4b5563' }}>Publicar Negócio</p>
+        <p className="text-xs tracking-widest uppercase mb-6" style={{ color: '#4b5563' }}>{t.sell.pageTitle}</p>
         {STEPS.map((s, i) => {
-          const done = i < step
+          const isDone = i < step
           const active = i === step
           return (
             <div
-              key={s.label}
+              key={s.title}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all"
               style={active ? { background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' } : {}}
             >
               <div
                 className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0"
-                style={done
+                style={isDone
                   ? { background: 'rgba(16,185,129,0.15)', color: '#10b981' }
                   : active
                     ? { background: '#10b981', color: '#fff' }
                     : { background: 'rgba(255,255,255,0.05)', color: '#4b5563' }
                 }
               >
-                {done ? '✓' : i + 1}
+                {isDone ? '✓' : i + 1}
               </div>
               <div>
-                <p className={`text-sm font-medium ${active ? 'text-white' : done ? 'text-gray-400' : 'text-gray-600'}`}>{s.label}</p>
-                {active && <p className="text-xs mt-0.5" style={{ color: '#4b5563' }}>{s.desc}</p>}
+                <p className={`text-sm font-medium ${active ? 'text-white' : isDone ? 'text-gray-400' : 'text-gray-600'}`}>{s.title}</p>
+                {active && <p className="text-xs mt-0.5" style={{ color: '#4b5563' }}>{s.subtitle}</p>}
               </div>
             </div>
           )
         })}
       </aside>
 
-      {/* Content */}
       <main className="flex-1 px-6 md:px-12 py-12 max-w-xl">
         <div className="mb-8">
-          <p className="text-xs tracking-widest uppercase mb-2" style={{ color: '#4b5563' }}>Passo {step + 1} de {STEPS.length}</p>
-          <h1 className="font-serif text-3xl font-bold">{STEPS[step].label}</h1>
-          <p className="mt-1 text-sm" style={{ color: '#6b7280' }}>{STEPS[step].desc}</p>
+          <p className="text-xs tracking-widest uppercase mb-2" style={{ color: '#4b5563' }}>Schritt {step + 1} von {STEPS.length}</p>
+          <h1 className="font-serif text-3xl font-bold">{STEPS[step].title}</h1>
+          <p className="mt-1 text-sm" style={{ color: '#6b7280' }}>{STEPS[step].subtitle}</p>
         </div>
 
         {error && (
@@ -142,26 +129,26 @@ export default function SellPage() {
         <div className="space-y-4">
           {step === 0 && (
             <>
-              <Field label="Nome do negócio">
-                <input className="input" value={data.name} onChange={e => update('name', e.target.value)} placeholder="Ex: Café Central Zurique" />
+              <Field label={t.sell.fields.businessName}>
+                <input className="input" value={data.name} onChange={e => update('name', e.target.value)} placeholder={t.sell.fields.businessNamePlaceholder} />
               </Field>
-              <Field label="Sector">
+              <Field label={t.sell.fields.sector}>
                 <div className="flex flex-wrap gap-2">
-                  {SECTORS.map(s => (
+                  {SECTOR_VALUES.map((val, idx) => (
                     <button
-                      key={s.value}
+                      key={val}
                       type="button"
-                      onClick={() => update('sector', s.value)}
+                      onClick={() => update('sector', val)}
                       className="h-9 px-4 rounded-full text-sm font-medium transition-all"
-                      style={data.sector === s.value
+                      style={data.sector === val
                         ? { background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.4)', color: '#34d399' }
                         : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }
                       }
-                    >{s.label}</button>
+                    >{t.sell.fields.sectors[idx]}</button>
                   ))}
                 </div>
               </Field>
-              <Field label="Ano de fundação">
+              <Field label={t.sell.fields.foundedYear}>
                 <input type="number" className="input" value={data.establishedYear} onChange={e => update('establishedYear', Number(e.target.value))} />
               </Field>
             </>
@@ -169,50 +156,50 @@ export default function SellPage() {
 
           {step === 1 && (
             <>
-              <Field label="Cantão">
+              <Field label={t.sell.fields.canton}>
                 <select className="input" value={data.canton} onChange={e => update('canton', e.target.value)}>
                   {['ZH','BE','AG','ZG','VD','GE','TI','outro'].map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </Field>
-              <Field label="Cidade">
-                <input className="input" value={data.city} onChange={e => update('city', e.target.value)} placeholder="Ex: Zurique" />
+              <Field label={t.sell.fields.city}>
+                <input className="input" value={data.city} onChange={e => update('city', e.target.value)} placeholder={t.sell.fields.cityPlaceholder} />
               </Field>
             </>
           )}
 
           {step === 2 && (
             <>
-              <Field label="Preço mínimo pedido (CHF)">
+              <Field label={t.sell.fields.priceMin}>
                 <input type="number" className="input" value={data.priceMin} onChange={e => update('priceMin', Number(e.target.value))} />
               </Field>
-              <Field label="Preço máximo pedido (CHF)">
+              <Field label={t.sell.fields.priceMax}>
                 <input type="number" className="input" value={data.priceMax} onChange={e => update('priceMax', Number(e.target.value))} />
               </Field>
-              <Field label="Faturamento anual (CHF)">
+              <Field label={t.sell.fields.annualRevenue}>
                 <input type="number" className="input" value={data.annualRevenue} onChange={e => update('annualRevenue', Number(e.target.value))} />
               </Field>
             </>
           )}
 
           {step === 3 && (
-            <Field label="Descrição do negócio">
+            <Field label={t.sell.fields.description}>
               <textarea
                 className="input h-40 resize-none"
                 value={data.description}
                 onChange={e => update('description', e.target.value)}
-                placeholder="Descreva o negócio, o que o torna especial, por que está à venda..."
+                placeholder={t.sell.fields.descriptionPlaceholder}
               />
             </Field>
           )}
         </div>
 
         <div className="flex justify-between mt-10">
-          <Button variant="secondary" disabled={step === 0} onClick={() => setStep(s => Math.max(0, s - 1))}>Voltar</Button>
+          <Button variant="secondary" disabled={step === 0} onClick={() => setStep(s => Math.max(0, s - 1))}>{t.sell.back}</Button>
           {step < STEPS.length - 1 ? (
-            <Button variant="primary" onClick={() => setStep(s => s + 1)}>Continuar →</Button>
+            <Button variant="primary" onClick={() => setStep(s => s + 1)}>{t.sell.next}</Button>
           ) : (
             <Button variant="primary" onClick={submit} disabled={loading}>
-              {loading ? 'Enviando...' : 'Submeter negócio'}
+              {loading ? t.sell.loading : t.sell.submit}
             </Button>
           )}
         </div>

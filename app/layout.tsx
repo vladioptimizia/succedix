@@ -5,8 +5,8 @@ import Footer from "@/components/Footer";
 import { LocaleProvider } from "@/lib/i18n/LocaleContext";
 
 export const metadata: Metadata = {
-  title: "Succedix — Intelligenz für Unternehmensnachfolge",
-  description: "Wir verbinden Schweizer Inhaber mit den richtigen Nachfolgern. Ohne Zwischenhändler.",
+  title: "Succedix — Nachfolge-Intelligenz für Unternehmen",
+  description: "Wir verbinden Schweizer Eigentümer mit den richtigen Nachfolgern. Ohne Zwischenhändler.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -7,24 +7,9 @@ import ScoreCircle from '@/components/ScoreCircle'
 import { calculateBuyerReadinessScore } from '@/lib/scoring'
 import { BuyerReadinessInput, Sector } from '@/lib/types'
 import { createClient } from '@/lib/supabase/browser'
+import { useTranslation } from '@/lib/i18n/LocaleContext'
 
-const STEPS = [
-  { label: 'Capital', desc: 'Capacidade de investimento' },
-  { label: 'Sectores', desc: 'Áreas de interesse' },
-  { label: 'Localização', desc: 'Região preferida' },
-  { label: 'Envolvimento', desc: 'Dedicação ao negócio' },
-  { label: 'Experiência', desc: 'Seu background' },
-  { label: 'Prazo', desc: 'Timeline e idiomas' },
-]
-
-const SECTORS: { value: Sector; label: string }[] = [
-  { value: 'cafe', label: 'Café' },
-  { value: 'restaurante', label: 'Restaurante' },
-  { value: 'varejo', label: 'Varejo' },
-  { value: 'servicos', label: 'Serviços' },
-  { value: 'saude', label: 'Saúde' },
-  { value: 'outro', label: 'Outro' },
-]
+const SECTOR_VALUES: Sector[] = ['cafe', 'restaurante', 'varejo', 'servicos', 'saude', 'outro']
 
 const initialState: BuyerReadinessInput = {
   capitalMin: 0, capitalMax: 0, capitalSource: 'proprio',
@@ -36,6 +21,8 @@ const initialState: BuyerReadinessInput = {
 
 export default function BuyerOnboardingPage() {
   const router = useRouter()
+  const { t } = useTranslation()
+  const STEPS = t.buyerOnboarding.steps
   const [step, setStep] = useState(0)
   const [data, setData] = useState<BuyerReadinessInput>(initialState)
   const [score, setScore] = useState<number | null>(null)
@@ -78,16 +65,14 @@ export default function BuyerOnboardingPage() {
   if (score !== null) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-8 px-6 py-16">
-        <p className="text-xs tracking-widest uppercase" style={{ color: '#4b5563' }}>Resultado</p>
-        <h1 className="font-serif text-3xl font-bold text-center">Buyer Readiness Score</h1>
+        <p className="text-xs tracking-widest uppercase" style={{ color: '#4b5563' }}>Ergebnis</p>
+        <h1 className="font-serif text-3xl font-bold text-center">{t.buyerOnboarding.result.title}</h1>
         <ScoreCircle score={score} label="" size={180} />
         <p className="text-center max-w-sm leading-relaxed" style={{ color: '#6b7280' }}>
-          {score >= 60
-            ? 'Seu perfil está pronto para explorar oportunidades de aquisição.'
-            : 'Recomendamos refinar seu perfil para encontrar melhores matches.'}
+          {score >= 60 ? t.buyerOnboarding.result.desc : t.buyerOnboarding.result.descLow}
         </p>
         <Button variant="primary" onClick={() => router.push('/discover')} className="px-10">
-          Explorar negócios →
+          {t.buyerOnboarding.result.cta}
         </Button>
       </div>
     )
@@ -99,13 +84,13 @@ export default function BuyerOnboardingPage() {
         className="hidden md:flex w-72 flex-col gap-2 p-8 pt-12 flex-shrink-0"
         style={{ background: 'rgba(255,255,255,0.02)', borderRight: '1px solid rgba(255,255,255,0.05)' }}
       >
-        <p className="text-xs tracking-widest uppercase mb-6" style={{ color: '#4b5563' }}>Prontidão do Comprador</p>
+        <p className="text-xs tracking-widest uppercase mb-6" style={{ color: '#4b5563' }}>{t.buyerOnboarding.pageTitle}</p>
         {STEPS.map((s, i) => {
           const done = i < step
           const active = i === step
           return (
             <div
-              key={s.label}
+              key={s.title}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all"
               style={active ? { background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' } : {}}
             >
@@ -121,8 +106,8 @@ export default function BuyerOnboardingPage() {
                 {done ? '✓' : i + 1}
               </div>
               <div>
-                <p className={`text-sm font-medium ${active ? 'text-white' : done ? 'text-gray-400' : 'text-gray-600'}`}>{s.label}</p>
-                {active && <p className="text-xs mt-0.5" style={{ color: '#4b5563' }}>{s.desc}</p>}
+                <p className={`text-sm font-medium ${active ? 'text-white' : done ? 'text-gray-400' : 'text-gray-600'}`}>{s.title}</p>
+                {active && <p className="text-xs mt-0.5" style={{ color: '#4b5563' }}>{s.subtitle}</p>}
               </div>
             </div>
           )
@@ -131,26 +116,25 @@ export default function BuyerOnboardingPage() {
 
       <main className="flex-1 px-6 md:px-12 py-12 max-w-xl">
         <div className="mb-8">
-          <p className="text-xs tracking-widest uppercase mb-2" style={{ color: '#4b5563' }}>Passo {step + 1} de {STEPS.length}</p>
-          <h1 className="font-serif text-3xl font-bold">{STEPS[step].label}</h1>
-          <p className="mt-1 text-sm" style={{ color: '#6b7280' }}>{STEPS[step].desc}</p>
+          <p className="text-xs tracking-widest uppercase mb-2" style={{ color: '#4b5563' }}>Schritt {step + 1} von {STEPS.length}</p>
+          <h1 className="font-serif text-3xl font-bold">{STEPS[step].title}</h1>
+          <p className="mt-1 text-sm" style={{ color: '#6b7280' }}>{STEPS[step].subtitle}</p>
         </div>
 
         <div className="space-y-4">
           {step === 0 && (
             <>
-              <Field label="Capital mínimo (CHF)">
+              <Field label={t.buyerOnboarding.fields.capitalMin}>
                 <input type="number" className="input" value={data.capitalMin} onChange={e => update('capitalMin', Number(e.target.value))} />
               </Field>
-              <Field label="Capital máximo (CHF)">
+              <Field label={t.buyerOnboarding.fields.capitalMax}>
                 <input type="number" className="input" value={data.capitalMax} onChange={e => update('capitalMax', Number(e.target.value))} />
               </Field>
-              <Field label="Fonte do capital">
+              <Field label={t.buyerOnboarding.fields.capitalSource}>
                 <select className="input" value={data.capitalSource} onChange={e => update('capitalSource', e.target.value as any)}>
-                  <option value="proprio">Capital próprio</option>
-                  <option value="credito">Crédito</option>
-                  <option value="combinado">Combinado</option>
-                  <option value="investor">Investidor</option>
+                  {(['proprio','credito','combinado','investor'] as const).map((val, idx) => (
+                    <option key={val} value={val}>{t.buyerOnboarding.fields.capitalSources[idx]}</option>
+                  ))}
                 </select>
               </Field>
             </>
@@ -158,80 +142,80 @@ export default function BuyerOnboardingPage() {
 
           {step === 1 && (
             <>
-              <p className="text-sm mb-3" style={{ color: '#6b7280' }}>Selecione um ou mais sectores</p>
+              <p className="text-sm mb-3" style={{ color: '#6b7280' }}>{t.buyerOnboarding.fields.sectorsLabel}</p>
               <div className="flex flex-wrap gap-2">
-                {SECTORS.map(s => {
-                  const selected = data.sectorsInterested.includes(s.value)
+                {SECTOR_VALUES.map((val, idx) => {
+                  const selected = data.sectorsInterested.includes(val)
                   return (
                     <button
-                      key={s.value}
-                      onClick={() => toggleSector(s.value)}
+                      key={val}
+                      onClick={() => toggleSector(val)}
                       className="h-9 px-4 rounded-full text-sm font-medium transition-all"
                       style={selected
                         ? { background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.4)', color: '#34d399' }
                         : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }
                       }
-                    >{s.label}</button>
+                    >{t.buyerOnboarding.fields.sectors[idx]}</button>
                   )
                 })}
               </div>
-              <Toggle label="Aberto a outros sectores?" value={data.openToOtherSectors} onChange={v => update('openToOtherSectors', v)} />
+              <Toggle label={t.buyerOnboarding.fields.openToOtherSectors} value={data.openToOtherSectors} onChange={v => update('openToOtherSectors', v)} yes={t.buyerOnboarding.yes} no={t.buyerOnboarding.no} />
             </>
           )}
 
           {step === 2 && (
             <>
-              <Field label="Cantão principal">
+              <Field label={t.buyerOnboarding.fields.canton}>
                 <select className="input" value={data.regionMain} onChange={e => update('regionMain', e.target.value as any)}>
                   {['ZH','BE','AG','ZG','VD','GE','TI','outro'].map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </Field>
-              <Field label={`Raio máximo: ${data.radiusKm} km`}>
+              <Field label={`${t.buyerOnboarding.fields.radius}: ${data.radiusKm} km`}>
                 <input type="range" min={10} max={100} step={10} className="w-full accent-success" value={data.radiusKm} onChange={e => update('radiusKm', Number(e.target.value))} />
               </Field>
-              <Toggle label="Explorar outras regiões?" value={data.exploreOtherRegions} onChange={v => update('exploreOtherRegions', v)} />
+              <Toggle label={t.buyerOnboarding.fields.exploreOtherRegions} value={data.exploreOtherRegions} onChange={v => update('exploreOtherRegions', v)} yes={t.buyerOnboarding.yes} no={t.buyerOnboarding.no} />
             </>
           )}
 
           {step === 3 && (
             <>
-              <Field label="Tipo de envolvimento">
+              <Field label={t.buyerOnboarding.fields.involvementType}>
                 <select className="input" value={data.involvementType} onChange={e => update('involvementType', e.target.value as any)}>
-                  <option value="operator">Operar ativamente</option>
-                  <option value="investor">Investidor passivo</option>
-                  <option value="unknown">Não sei</option>
+                  {(['operator','investor','unknown'] as const).map((val, idx) => (
+                    <option key={val} value={val}>{t.buyerOnboarding.fields.involvementTypes[idx]}</option>
+                  ))}
                 </select>
               </Field>
-              <Field label="Horas disponíveis por semana">
+              <Field label={t.buyerOnboarding.fields.hoursPerWeek}>
                 <input type="number" className="input" value={data.hoursAvailablePerWeek} onChange={e => update('hoursAvailablePerWeek', Number(e.target.value))} />
               </Field>
             </>
           )}
 
           {step === 4 && (
-            <Field label="Background de experiência">
-              <input className="input" value={data.experienceBackground} onChange={e => update('experienceBackground', e.target.value)} placeholder="Ex: Gestão bancária, 15 anos" />
+            <Field label={t.buyerOnboarding.fields.experienceBackground}>
+              <input className="input" value={data.experienceBackground} onChange={e => update('experienceBackground', e.target.value)} placeholder={t.buyerOnboarding.fields.experiencePlaceholder} />
             </Field>
           )}
 
           {step === 5 && (
             <>
-              <Field label="Quando deseja comprar? (meses)">
+              <Field label={t.buyerOnboarding.fields.timelineMonths}>
                 <input type="number" className="input" value={data.timelineMonths} onChange={e => update('timelineMonths', Number(e.target.value))} />
               </Field>
-              <Field label="Idiomas (separados por vírgula)">
-                <input className="input" value={data.languages.join(', ')} onChange={e => update('languages', e.target.value.split(',').map(l => l.trim()).filter(Boolean))} placeholder="Português, Inglês, Alemão" />
+              <Field label={t.buyerOnboarding.fields.languages}>
+                <input className="input" value={data.languages.join(', ')} onChange={e => update('languages', e.target.value.split(',').map(l => l.trim()).filter(Boolean))} placeholder={t.buyerOnboarding.fields.languagesPlaceholder} />
               </Field>
             </>
           )}
         </div>
 
         <div className="flex justify-between mt-10">
-          <Button variant="secondary" disabled={step === 0} onClick={() => setStep(s => Math.max(0, s - 1))}>Voltar</Button>
+          <Button variant="secondary" disabled={step === 0} onClick={() => setStep(s => Math.max(0, s - 1))}>{t.buyerOnboarding.back}</Button>
           {step < STEPS.length - 1 ? (
-            <Button variant="primary" onClick={() => setStep(s => s + 1)}>Continuar →</Button>
+            <Button variant="primary" onClick={() => setStep(s => s + 1)}>{t.buyerOnboarding.next}</Button>
           ) : (
-            <Button variant="primary" onClick={submit}>Ver meu score</Button>
+            <Button variant="primary" onClick={submit}>{t.buyerOnboarding.submit}</Button>
           )}
         </div>
       </main>
@@ -248,13 +232,13 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   )
 }
 
-function Toggle({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
+function Toggle({ label, value, onChange, yes, no }: { label: string; value: boolean; onChange: (v: boolean) => void; yes: string; no: string }) {
   return (
     <div className="flex items-center justify-between py-1">
       <span className="text-sm" style={{ color: '#9ca3af' }}>{label}</span>
       <div className="flex gap-2">
-        <button onClick={() => onChange(true)} className="h-8 px-4 rounded-full text-xs font-medium transition-all" style={value ? { background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.4)', color: '#34d399' } : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }}>Sim</button>
-        <button onClick={() => onChange(false)} className="h-8 px-4 rounded-full text-xs font-medium transition-all" style={!value ? { background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.4)', color: '#34d399' } : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }}>Não</button>
+        <button onClick={() => onChange(true)} className="h-8 px-4 rounded-full text-xs font-medium transition-all" style={value ? { background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.4)', color: '#34d399' } : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }}>{yes}</button>
+        <button onClick={() => onChange(false)} className="h-8 px-4 rounded-full text-xs font-medium transition-all" style={!value ? { background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.4)', color: '#34d399' } : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }}>{no}</button>
       </div>
     </div>
   )

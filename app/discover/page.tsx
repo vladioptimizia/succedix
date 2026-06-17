@@ -58,7 +58,6 @@ export default function DiscoverPage() {
       .eq('buyer_id', userId)
       .in('action', ['like', 'save']);
     if (data) {
-      // Supabase returns related records as arrays; flatten and deduplicate by id
       const seen = new Set<string>();
       const businesses: SavedBusiness[] = [];
       for (const row of data as { businesses: SavedBusiness[] }[]) {
@@ -157,8 +156,8 @@ export default function DiscoverPage() {
 
   useEffect(() => {
     if (!toast) return;
-    const t = setTimeout(() => setToast(null), 3000);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(timer);
   }, [toast]);
 
   async function handleSwipe(action: SwipeAction) {
@@ -200,7 +199,9 @@ export default function DiscoverPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-serif text-2xl font-bold">{t.discover.title}</h1>
-            <p className="text-sm mt-0.5" style={{ color: '#4b5563' }}>{t.discover.swipesRemaining(swipesRemaining)}</p>
+            <p className="text-sm mt-0.5" style={{ color: '#4b5563' }}>
+              {swipesRemaining} {swipesRemaining !== 1 ? t.discover.swipePlural : t.discover.swipeSingular}
+            </p>
           </div>
           <Link href="/" className="text-sm" style={{ color: '#4b5563' }}>{t.discover.back}</Link>
         </div>
@@ -250,7 +251,7 @@ export default function DiscoverPage() {
 
         {savedBusinesses.length > 0 && (
           <section>
-            <p className="text-xs tracking-widest uppercase mb-4" style={{ color: '#4b5563' }}>{t.discover.savedTitle(savedBusinesses.length)}</p>
+            <p className="text-xs tracking-widest uppercase mb-4" style={{ color: '#4b5563' }}>{t.discover.savedTitle} ({savedBusinesses.length})</p>
             <div className="flex flex-col gap-2">
               {savedBusinesses.map((b, i) => (
                 <div key={b.id ?? i} className="px-4 py-3 rounded-xl flex items-center justify-between text-sm" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>

@@ -9,8 +9,8 @@ import { useTranslation } from '@/lib/i18n/LocaleContext'
 type Tab = 'login' | 'signup'
 
 export default function LoginPage() {
-  const { t } = useTranslation()
   const router = useRouter()
+  const { t } = useTranslation()
   const [tab, setTab] = useState<Tab>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -72,17 +72,17 @@ export default function LoginPage() {
         >
           {/* Tabs */}
           <div className="flex rounded-xl overflow-hidden mb-6" style={{ background: 'rgba(255,255,255,0.04)' }}>
-            {(['login', 'signup'] as Tab[]).map((tab_option) => (
+            {(['login', 'signup'] as Tab[]).map((tabKey) => (
               <button
-                key={tab_option}
-                onClick={() => { setTab(tab_option); setError(null); setSuccess(null) }}
+                key={tabKey}
+                onClick={() => { setTab(tabKey); setError(null); setSuccess(null) }}
                 className="flex-1 h-9 text-sm font-medium transition-all rounded-xl"
-                style={tab === tab_option
+                style={tab === tabKey
                   ? { background: 'rgba(255,255,255,0.08)', color: '#f9fafb' }
                   : { color: '#6b7280' }
                 }
               >
-                {tab_option === 'login' ? t.login.tabLogin : t.login.tabSignup}
+                {tabKey === 'login' ? t.login.tabLogin : t.login.tabSignup}
               </button>
             ))}
           </div>
@@ -102,7 +102,7 @@ export default function LoginPage() {
             {tab === 'signup' && (
               <>
                 <Field label={t.login.namePlaceholder}>
-                  <input className="input" type="text" placeholder={t.login.namePlaceholder} value={fullName} onChange={e => setFullName(e.target.value)} required />
+                  <input className="input" type="text" value={fullName} onChange={e => setFullName(e.target.value)} required />
                 </Field>
                 <Field label={t.login.profileLabel}>
                   <div className="flex gap-2">
@@ -124,10 +124,10 @@ export default function LoginPage() {
             )}
 
             <Field label={t.login.emailPlaceholder}>
-              <input className="input" type="email" placeholder={t.login.emailPlaceholder} value={email} onChange={e => setEmail(e.target.value)} required />
+              <input className="input" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
             </Field>
             <Field label={t.login.passwordPlaceholder}>
-              <input className="input" type="password" placeholder={t.login.passwordPlaceholder} value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
+              <input className="input" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
             </Field>
 
             <button

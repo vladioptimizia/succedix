@@ -1,21 +1,19 @@
 'use client';
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import de from './de';
 import en from './en';
-import type { Translations } from './types';
 
-export type Locale = 'de' | 'en';
+type Locale = 'de' | 'en';
 const translations = { de, en } as const;
 
 interface LocaleContextType {
-  t: Translations;
+  t: typeof de;
   locale: Locale;
   switchLocale: (l: Locale) => void;
 }
 
 const LocaleContext = createContext<LocaleContextType>({
-  t: de as Translations,
+  t: de,
   locale: 'de',
   switchLocale: () => {},
 });
