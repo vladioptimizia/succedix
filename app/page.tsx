@@ -17,8 +17,9 @@ export default function LandingPage() {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80&auto=format&fit=crop')",
-            filter: 'grayscale(40%) brightness(0.35)',
+            backgroundImage: "url('https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1600&q=80&auto=format&fit=crop')",
+            filter: 'grayscale(100%) brightness(0.30) contrast(1.2)',
+            backgroundPosition: 'center 30%',
           }}
         />
         {/* green tint overlay */}
