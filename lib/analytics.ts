@@ -15,7 +15,7 @@ export function trackEvent(name: string, params?: Record<string, unknown>) {
 
 export function trackPageView(url: string) {
   if (typeof window === 'undefined') return;
-  window.gtag?.('config', process.env.NEXT_PUBLIC_GA_ID, { page_path: url });
+  window.gtag?.('config', process.env.NEXT_PUBLIC_GA4_ID, { page_path: url });
 }
 
 export function trackSwipe(action: 'like' | 'pass' | 'save', businessId: string) {
