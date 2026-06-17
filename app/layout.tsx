@@ -2,19 +2,22 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { LocaleProvider } from "@/lib/i18n/LocaleContext";
 
 export const metadata: Metadata = {
-  title: "Succedix — Inteligência de Sucessão Empresarial",
-  description: "Conectamos proprietários suíços e compradores certos. Sem intermediários.",
+  title: "Succedix — Intelligenz für Unternehmensnachfolge",
+  description: "Wir verbinden Schweizer Inhaber mit den richtigen Nachfolgern. Ohne Zwischenhändler.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt">
+    <html lang="de">
       <body>
-        <Header />
-        <div className="pt-16">{children}</div>
-        <Footer />
+        <LocaleProvider>
+          <Header />
+          <div className="pt-16">{children}</div>
+          <Footer />
+        </LocaleProvider>
       </body>
     </html>
   );

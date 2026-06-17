@@ -4,10 +4,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/browser'
+import { useTranslation } from '@/lib/i18n/LocaleContext'
 
 type Tab = 'login' | 'signup'
 
 export default function LoginPage() {
+  const { t } = useTranslation()
   const router = useRouter()
   const [tab, setTab] = useState<Tab>('login')
   const [email, setEmail] = useState('')
@@ -49,7 +51,7 @@ export default function LoginPage() {
       setLoading(false)
       return
     }
-    setSuccess('Conta criada! Faça login para continuar.')
+    setSuccess(t.login.successMsg)
     setTab('login')
     setLoading(false)
   }
@@ -61,7 +63,7 @@ export default function LoginPage() {
           <Link href="/" className="font-serif text-2xl font-semibold">
             Succedix<span className="text-success">.</span>
           </Link>
-          <p className="mt-2 text-sm" style={{ color: '#6b7280' }}>Plataforma de sucessão empresarial</p>
+          <p className="mt-2 text-sm" style={{ color: '#6b7280' }}>{t.login.subtitle}</p>
         </div>
 
         <div
@@ -70,17 +72,17 @@ export default function LoginPage() {
         >
           {/* Tabs */}
           <div className="flex rounded-xl overflow-hidden mb-6" style={{ background: 'rgba(255,255,255,0.04)' }}>
-            {(['login', 'signup'] as Tab[]).map((t) => (
+            {(['login', 'signup'] as Tab[]).map((tab_option) => (
               <button
-                key={t}
-                onClick={() => { setTab(t); setError(null); setSuccess(null) }}
+                key={tab_option}
+                onClick={() => { setTab(tab_option); setError(null); setSuccess(null) }}
                 className="flex-1 h-9 text-sm font-medium transition-all rounded-xl"
-                style={tab === t
+                style={tab === tab_option
                   ? { background: 'rgba(255,255,255,0.08)', color: '#f9fafb' }
                   : { color: '#6b7280' }
                 }
               >
-                {t === 'login' ? 'Entrar' : 'Criar conta'}
+                {tab_option === 'login' ? t.login.tabLogin : t.login.tabSignup}
               </button>
             ))}
           </div>
@@ -99,12 +101,12 @@ export default function LoginPage() {
           <form onSubmit={tab === 'login' ? handleLogin : handleSignup} className="space-y-4">
             {tab === 'signup' && (
               <>
-                <Field label="Nome completo">
-                  <input className="input" type="text" value={fullName} onChange={e => setFullName(e.target.value)} required />
+                <Field label={t.login.namePlaceholder}>
+                  <input className="input" type="text" placeholder={t.login.namePlaceholder} value={fullName} onChange={e => setFullName(e.target.value)} required />
                 </Field>
-                <Field label="Perfil">
+                <Field label={t.login.profileLabel}>
                   <div className="flex gap-2">
-                    {([['buyer', 'Comprador'], ['vendor', 'Vendedor']] as const).map(([val, label]) => (
+                    {([['buyer', t.login.profileBuyer], ['vendor', t.login.profileSeller]] as const).map(([val, label]) => (
                       <button
                         key={val}
                         type="button"
@@ -121,11 +123,11 @@ export default function LoginPage() {
               </>
             )}
 
-            <Field label="Email">
-              <input className="input" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+            <Field label={t.login.emailPlaceholder}>
+              <input className="input" type="email" placeholder={t.login.emailPlaceholder} value={email} onChange={e => setEmail(e.target.value)} required />
             </Field>
-            <Field label="Senha">
-              <input className="input" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
+            <Field label={t.login.passwordPlaceholder}>
+              <input className="input" type="password" placeholder={t.login.passwordPlaceholder} value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
             </Field>
 
             <button
@@ -134,7 +136,7 @@ export default function LoginPage() {
               className="w-full h-11 rounded-full font-medium text-sm transition-all mt-2"
               style={{ background: '#10b981', color: '#fff', opacity: loading ? 0.7 : 1 }}
             >
-              {loading ? 'Aguarde...' : tab === 'login' ? 'Entrar' : 'Criar conta'}
+              {loading ? t.login.loadingBtn : tab === 'login' ? t.login.loginBtn : t.login.signupBtn}
             </button>
           </form>
         </div>

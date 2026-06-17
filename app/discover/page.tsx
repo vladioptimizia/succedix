@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/browser';
 import { calculateSuccessionFitScore } from '@/lib/scoring';
 import { BuyerReadinessInput, Canton, Sector, SwipeAction } from '@/lib/types';
 import { SWIPES_PER_DAY as DAILY_LIMIT } from '@/lib/constants';
+import { useTranslation } from '@/lib/i18n/LocaleContext';
 
 interface CardData {
   id: string;
@@ -32,6 +33,7 @@ interface SavedBusiness {
 }
 
 export default function DiscoverPage() {
+  const { t } = useTranslation();
   const [card, setCard] = useState<CardData | null>(null);
   const [fitScore, setFitScore] = useState(75);
   const [swipesRemaining, setSwipesRemaining] = useState(DAILY_LIMIT);
@@ -171,9 +173,9 @@ export default function DiscoverPage() {
     if (res.status === 429) { setLimitReached(true); setSwipesRemaining(0); return; }
     if (json.swipesRemaining !== undefined) setSwipesRemaining(json.swipesRemaining);
     if (json.limitReached) setLimitReached(true);
-    if (action === 'like') setToast('Adicionado aos salvos');
-    else if (action === 'save') setToast('Guardado para depois');
-    else setToast('Próximo negócio');
+    if (action === 'like') setToast(t.discover.toastLike);
+    else if (action === 'save') setToast(t.discover.toastSave);
+    else setToast(t.discover.toastPass);
     if (action !== 'pass') fetchSaved(userId);
     if (!json.limitReached) fetchNextCard();
   }
@@ -186,9 +188,9 @@ export default function DiscoverPage() {
 
   if (noProfile) return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-6 text-center">
-      <h2 className="font-serif text-2xl font-bold">Complete o seu perfil primeiro</h2>
-      <p className="text-sm" style={{ color: '#6b7280' }}>Precisamos saber o que procura para mostrar os melhores negócios.</p>
-      <Link href="/onboarding/buyer"><Button variant="primary">Criar perfil de comprador</Button></Link>
+      <h2 className="font-serif text-2xl font-bold">{t.discover.noProfileTitle}</h2>
+      <p className="text-sm" style={{ color: '#6b7280' }}>{t.discover.noProfileDesc}</p>
+      <Link href="/onboarding/buyer"><Button variant="primary">{t.discover.noProfileCta}</Button></Link>
     </div>
   );
 
@@ -197,12 +199,10 @@ export default function DiscoverPage() {
       <div className="max-w-lg mx-auto flex flex-col gap-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-serif text-2xl font-bold">Descobrir</h1>
-            <p className="text-sm mt-0.5" style={{ color: '#4b5563' }}>
-              {swipesRemaining} swipe{swipesRemaining !== 1 ? 's' : ''} restante{swipesRemaining !== 1 ? 's' : ''} hoje
-            </p>
+            <h1 className="font-serif text-2xl font-bold">{t.discover.title}</h1>
+            <p className="text-sm mt-0.5" style={{ color: '#4b5563' }}>{t.discover.swipesRemaining(swipesRemaining)}</p>
           </div>
-          <Link href="/" className="text-sm" style={{ color: '#4b5563' }}>← Início</Link>
+          <Link href="/" className="text-sm" style={{ color: '#4b5563' }}>{t.discover.back}</Link>
         </div>
 
         <div className="h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
@@ -232,25 +232,25 @@ export default function DiscoverPage() {
               fitScore={fitScore}
             />
             <div className="flex items-center gap-3 w-full max-w-sm">
-              <button onClick={() => handleSwipe('pass')} className="flex-1 h-12 rounded-full text-sm font-medium" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}>← Passar</button>
-              <button onClick={() => handleSwipe('like')} className="flex-1 h-12 rounded-full text-sm font-medium" style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', color: '#34d399' }}>♡ Like</button>
-              <button onClick={() => handleSwipe('save')} className="h-12 px-4 rounded-full text-sm font-medium" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }}>📌</button>
+              <button onClick={() => handleSwipe('pass')} className="flex-1 h-12 rounded-full text-sm font-medium" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}>{t.discover.pass}</button>
+              <button onClick={() => handleSwipe('like')} className="flex-1 h-12 rounded-full text-sm font-medium" style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', color: '#34d399' }}>{t.discover.like}</button>
+              <button onClick={() => handleSwipe('save')} className="h-12 px-4 rounded-full text-sm font-medium" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#6b7280' }}>{t.discover.save}</button>
             </div>
           </div>
         ) : (
           <div className="rounded-2xl p-10 flex flex-col items-center gap-4 text-center" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
             <span className="text-4xl">{limitReached ? '⏳' : '🎉'}</span>
-            <h2 className="font-serif text-xl font-semibold">{limitReached ? 'Limite diário atingido' : 'Sem mais negócios'}</h2>
+            <h2 className="font-serif text-xl font-semibold">{limitReached ? t.discover.limitTitle : t.discover.noMoreTitle}</h2>
             <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
-              {limitReached ? 'Volte amanhã ou faça upgrade para swipes ilimitados.' : 'Não há mais negócios disponíveis. Novos negócios são adicionados regularmente.'}
+              {limitReached ? t.discover.limitDesc : t.discover.noMoreDesc}
             </p>
-            {limitReached && <Button variant="primary" className="mt-2">Upgrade — CHF 24/mês</Button>}
+            {limitReached && <Button variant="primary" className="mt-2">{t.discover.limitUpgrade}</Button>}
           </div>
         )}
 
         {savedBusinesses.length > 0 && (
           <section>
-            <p className="text-xs tracking-widest uppercase mb-4" style={{ color: '#4b5563' }}>Salvos ({savedBusinesses.length})</p>
+            <p className="text-xs tracking-widest uppercase mb-4" style={{ color: '#4b5563' }}>{t.discover.savedTitle(savedBusinesses.length)}</p>
             <div className="flex flex-col gap-2">
               {savedBusinesses.map((b, i) => (
                 <div key={b.id ?? i} className="px-4 py-3 rounded-xl flex items-center justify-between text-sm" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
