@@ -120,6 +120,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         router.push('/login')
         return
       }
+      if (session.user.email !== 'vladimir.m.f95@gmail.com') {
+        router.push('/')
+        return
+      }
       setUserEmail(session.user.email ?? null)
     })
   }, [router])
