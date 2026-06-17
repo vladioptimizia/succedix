@@ -116,10 +116,20 @@ export default function BuyerOnboardingPage() {
         })}
       </aside>
 
-      <main className="flex-1 px-6 md:px-12 py-12 max-w-xl">
+      <main className="flex-1 px-6 md:px-12 py-8 md:py-12 max-w-xl pb-28 md:pb-12">
+        {/* Mobile progress bar */}
+        <div className="md:hidden mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium" style={{ color: '#6b7280' }}>Schritt {step + 1} von {STEPS.length}</span>
+            <span className="text-xs font-medium" style={{ color: '#10b981' }}>{STEPS[step].title}</span>
+          </div>
+          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <div className="h-full rounded-full transition-all duration-300" style={{ width: `${((step + 1) / STEPS.length) * 100}%`, background: 'linear-gradient(90deg, #10b981, #34d399)' }} />
+          </div>
+        </div>
         <div className="mb-8">
-          <p className="text-xs tracking-widest uppercase mb-2" style={{ color: '#4b5563' }}>Schritt {step + 1} von {STEPS.length}</p>
-          <h1 className="font-serif text-3xl font-bold">{STEPS[step].title}</h1>
+          <p className="hidden md:block text-xs tracking-widest uppercase mb-2" style={{ color: '#4b5563' }}>Schritt {step + 1} von {STEPS.length}</p>
+          <h1 className="font-serif text-2xl md:text-3xl font-bold">{STEPS[step].title}</h1>
           <p className="mt-1 text-sm" style={{ color: '#6b7280' }}>{STEPS[step].subtitle}</p>
         </div>
 
@@ -212,12 +222,34 @@ export default function BuyerOnboardingPage() {
           )}
         </div>
 
-        <div className="flex justify-between mt-10">
+        {/* Desktop buttons */}
+        <div className="hidden md:flex justify-between mt-10">
           <Button variant="secondary" disabled={step === 0} onClick={() => setStep(s => Math.max(0, s - 1))}>{t.buyerOnboarding.back}</Button>
           {step < STEPS.length - 1 ? (
             <Button variant="primary" onClick={() => setStep(s => s + 1)}>{t.buyerOnboarding.next}</Button>
           ) : (
             <Button variant="primary" onClick={submit}>{t.buyerOnboarding.submit}</Button>
+          )}
+        </div>
+        {/* Mobile sticky footer buttons */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 flex gap-3 p-4" style={{ background: 'rgba(8,8,8,0.97)', borderTop: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(12px)' }}>
+          <button disabled={step === 0} onClick={() => setStep(s => Math.max(0, s - 1))}
+            className="flex-1 h-12 rounded-xl text-sm font-medium disabled:opacity-30"
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#e5e7eb' }}>
+            {t.buyerOnboarding.back}
+          </button>
+          {step < STEPS.length - 1 ? (
+            <button onClick={() => setStep(s => s + 1)}
+              className="flex-1 h-12 rounded-xl text-sm font-medium"
+              style={{ background: '#10b981', color: '#fff' }}>
+              {t.buyerOnboarding.next}
+            </button>
+          ) : (
+            <button onClick={submit}
+              className="flex-1 h-12 rounded-xl text-sm font-medium"
+              style={{ background: '#10b981', color: '#fff' }}>
+              {t.buyerOnboarding.submit}
+            </button>
           )}
         </div>
       </main>
