@@ -11,9 +11,20 @@ export default function LandingPage() {
 
       {/* ─── HERO ─── */}
       <section
-        className="relative flex flex-col items-center text-center px-6 pt-28 pb-32 gap-8"
-        style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(16,185,129,0.12), transparent)' }}
+        className="relative flex flex-col items-center text-center px-6 pt-28 pb-32 gap-8 overflow-hidden"
       >
+        {/* Swiss city background photo */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1530549387789-4c1017266635?w=1600&q=80&auto=format&fit=crop')",
+            filter: 'grayscale(40%) brightness(0.35)',
+          }}
+        />
+        {/* green tint overlay */}
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(16,185,129,0.10), transparent), linear-gradient(to bottom, rgba(8,8,8,0.2) 0%, rgba(8,8,8,0.7) 100%)' }} />
+        {/* content sits above overlays */}
+        <div className="relative z-10 flex flex-col items-center gap-8 w-full">
         <span
           className="inline-flex items-center gap-2 text-xs tracking-widest uppercase px-4 py-1.5 rounded-full"
           style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', color: '#6ee7b7' }}
@@ -59,6 +70,7 @@ export default function LandingPage() {
         </div>
 
         <p className="text-gray-600 text-xs mt-1">{t.hero.freeSwipes}</p>
+        </div>
       </section>
 
       {/* ─── 3 PILLARS ─── */}
