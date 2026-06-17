@@ -5,7 +5,7 @@ export default function Header() {
     <header className="fixed top-0 inset-x-0 z-50" style={{ background: 'rgba(8,8,8,0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="font-serif text-xl font-semibold tracking-tight flex items-center gap-2">
-          Succedix<span className="text-success">.</span>
+          Succedix<span className="text-success ml-1">.</span>
           <span className="text-base" title="Plataforma exclusiva para a Suíça">🇨🇭</span>
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm text-gray-400">
