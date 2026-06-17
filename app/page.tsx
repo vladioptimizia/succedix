@@ -13,7 +13,7 @@ export default function LandingPage() {
           style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', color: '#6ee7b7' }}
         >
           <span className="w-1.5 h-1.5 rounded-full bg-success inline-block" />
-          Plataforma exclusiva para a Suíça
+          🇨🇭 Plataforma exclusiva para a Suíça
         </span>
 
         <h1 className="font-serif text-5xl md:text-7xl font-bold max-w-3xl leading-tight" style={{ letterSpacing: '-0.02em' }}>
