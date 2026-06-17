@@ -21,8 +21,8 @@ export default function LandingPage() {
           <span style={{ background: 'linear-gradient(135deg, #10b981, #34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Oportunidades reais.</span>
         </h1>
 
-        <p className="text-gray-400 max-w-md text-lg leading-relaxed">
-          Conectamos proprietários e compradores certos — sem intermediários, sem fricção.
+        <p className="text-gray-400 max-w-lg text-lg leading-relaxed">
+          Conectamos compradores locais e proprietários que se aposentam de micro e pequenas empresas — cafés, lojas, estúdios e muito mais. Simples, local e construída para a sua comunidade.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 mt-2">
@@ -58,8 +58,28 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Para quem é */}
+      <section className="px-6 py-20" style={{ background: 'rgba(16,185,129,0.03)', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
+          <AudienceCard
+            tag="Para compradores"
+            title="Encontre o negócio certo na sua cidade"
+            description="Cafés, lojas, estúdios, serviços. Negócios verificados com histórico real, a dois passos de si."
+            cta="Criar perfil de comprador"
+            href="/onboarding/buyer"
+          />
+          <AudienceCard
+            tag="Para vendedores"
+            title="Passe o seu legado para as mãos certas"
+            description="Proprietários que se aposentam merecem um sucessor que valorize o que foi construído."
+            cta="Avaliar o meu negócio"
+            href="/onboarding/seller"
+          />
+        </div>
+      </section>
+
       {/* Destaques */}
-      <section className="px-6 py-20" style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+      <section className="px-6 py-20">
         <div className="max-w-4xl mx-auto">
           <p className="text-center text-xs tracking-widest uppercase text-gray-500 mb-3">Diferenciais</p>
           <h2 className="font-serif text-3xl font-bold text-center mb-12">Porquê a Succedix</h2>
@@ -73,7 +93,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="px-6 py-24 flex flex-col items-center text-center gap-6">
+      <section className="px-6 py-24 flex flex-col items-center text-center gap-6" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
         <h2 className="font-serif text-3xl md:text-4xl font-bold max-w-xl">Pronto para encontrar o seu negócio?</h2>
         <p className="text-gray-400 max-w-sm">Comece gratuitamente hoje. 5 swipes por dia, sem compromisso.</p>
         <Link
@@ -105,6 +125,26 @@ function StepCard({ number, title, description }: { number: string; title: strin
       <span className="font-serif text-4xl font-bold" style={{ background: 'linear-gradient(135deg, #10b981, #34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{number}</span>
       <h3 className="text-lg font-semibold">{title}</h3>
       <p className="text-gray-500 text-sm leading-relaxed">{description}</p>
+    </div>
+  );
+}
+
+function AudienceCard({ tag, title, description, cta, href }: { tag: string; title: string; description: string; cta: string; href: string }) {
+  return (
+    <div
+      className="p-8 rounded-2xl flex flex-col gap-4"
+      style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}
+    >
+      <span className="text-xs tracking-widest uppercase" style={{ color: '#10b981' }}>{tag}</span>
+      <h3 className="font-serif text-xl font-bold leading-snug">{title}</h3>
+      <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>{description}</p>
+      <Link
+        href={href}
+        className="mt-2 self-start h-9 px-5 rounded-full text-sm font-medium flex items-center"
+        style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', color: '#34d399' }}
+      >
+        {cta} →
+      </Link>
     </div>
   );
 }
