@@ -351,6 +351,21 @@ const en = {
     dismiss: 'Not now',
     active: 'Active',
   },
+  consent: {
+    title: 'We use cookies',
+    description: 'Succedix uses cookies to improve your experience and optimise the service.',
+    acceptAll: 'Accept all',
+    essentialOnly: 'Essential only',
+    customize: 'Customize',
+    save: 'Save preferences',
+    analytics: 'Analytics',
+    analyticsDesc: 'Helps us understand how you use the platform (GA4, anonymous)',
+    location: 'Location',
+    locationDesc: 'Shows businesses near you (by canton)',
+    marketing: 'Marketing',
+    marketingDesc: 'Personalised advertising (coming soon)',
+    learnMore: 'Privacy',
+  },
 };
 
 export default en;

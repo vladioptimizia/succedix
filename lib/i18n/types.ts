@@ -54,4 +54,19 @@ export interface Translations {
     dismiss: string;
     active: string;
   };
+  consent: {
+    title: string;
+    description: string;
+    acceptAll: string;
+    essentialOnly: string;
+    customize: string;
+    save: string;
+    analytics: string;
+    analyticsDesc: string;
+    location: string;
+    locationDesc: string;
+    marketing: string;
+    marketingDesc: string;
+    learnMore: string;
+  };
 }

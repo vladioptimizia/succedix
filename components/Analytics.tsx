@@ -3,6 +3,7 @@ import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, Suspense } from 'react';
 import { trackPageView } from '@/lib/analytics';
+import { useConsent } from './ConsentProvider';
 
 const GA_ID = process.env.NEXT_PUBLIC_GA4_ID;
 const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
@@ -17,6 +18,10 @@ function AnalyticsInner() {
 }
 
 export default function Analytics() {
+  const consent = useConsent();
+  if (consent === null) return null;
+  if (!consent.analytics) return null;
+
   return (
     <>
       {GA_ID && (

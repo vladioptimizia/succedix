@@ -351,6 +351,21 @@ const de = {
     dismiss: 'Jetzt nicht',
     active: 'Aktiv',
   },
+  consent: {
+    title: 'Wir verwenden Cookies',
+    description: 'Succedix verwendet Cookies, um Ihr Erlebnis zu verbessern und den Dienst zu optimieren.',
+    acceptAll: 'Alle akzeptieren',
+    essentialOnly: 'Nur essenzielle',
+    customize: 'Anpassen',
+    save: 'Einstellungen speichern',
+    analytics: 'Analyse',
+    analyticsDesc: 'Hilft uns zu verstehen, wie Sie die Plattform nutzen (GA4, anonym)',
+    location: 'Standort',
+    locationDesc: 'Zeigt Unternehmen in Ihrer Nähe (Kanton)',
+    marketing: 'Marketing',
+    marketingDesc: 'Personalisierte Werbung (demnächst verfügbar)',
+    learnMore: 'Datenschutz',
+  },
 };
 
 export default de;
