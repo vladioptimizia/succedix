@@ -13,17 +13,18 @@ export default function LandingPage() {
       <section
         className="relative flex flex-col items-center text-center px-6 pt-28 pb-32 gap-8 overflow-hidden"
       >
-        {/* Swiss city background photo */}
+        {/* Matterhorn hero background */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-no-repeat"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1600&q=80&auto=format&fit=crop')",
-            filter: 'grayscale(100%) brightness(0.55) contrast(1.3)',
-            backgroundPosition: 'center 20%',
+            backgroundImage: "url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1800&q=85&auto=format&fit=crop')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            filter: 'grayscale(100%) brightness(0.60) contrast(1.25)',
           }}
         />
-        {/* green tint overlay */}
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(16,185,129,0.06), transparent), linear-gradient(to bottom, rgba(8,8,8,0.1) 0%, rgba(8,8,8,0.75) 100%)' }} />
+        {/* dark gradient overlay — lighter at center so the peak stays visible */}
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 70% 70% at 50% 40%, rgba(8,8,8,0.0) 0%, rgba(8,8,8,0.55) 100%), linear-gradient(to bottom, rgba(8,8,8,0.35) 0%, rgba(8,8,8,0.0) 35%, rgba(8,8,8,0.0) 60%, rgba(8,8,8,0.85) 100%)' }} />
         {/* content sits above overlays */}
         <div className="relative z-10 flex flex-col items-center gap-8 w-full">
         <span
