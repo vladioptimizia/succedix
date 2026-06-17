@@ -17,7 +17,7 @@ export default function LandingPage() {
         <div
           className="absolute inset-0 bg-no-repeat"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1800&q=85&auto=format&fit=crop')",
+            backgroundImage: "url('/matterhorn.jpg')",
             backgroundSize: 'cover',
             backgroundPosition: 'center center',
             filter: 'grayscale(100%) brightness(0.60) contrast(1.25)',
