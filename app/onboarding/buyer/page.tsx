@@ -8,6 +8,7 @@ import { calculateBuyerReadinessScore } from '@/lib/scoring'
 import { BuyerReadinessInput, Sector } from '@/lib/types'
 import { createClient } from '@/lib/supabase/browser'
 import { useTranslation } from '@/lib/i18n/LocaleContext'
+import { trackOnboardingStart } from '@/lib/analytics'
 
 const SECTOR_VALUES: Sector[] = ['cafe', 'restaurante', 'varejo', 'servicos', 'saude', 'outro']
 
@@ -42,6 +43,7 @@ export default function BuyerOnboardingPage() {
   }
 
   async function submit() {
+    trackOnboardingStart('buyer')
     const computed = calculateBuyerReadinessScore(data)
     setScore(computed)
 

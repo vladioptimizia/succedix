@@ -7,6 +7,7 @@ import { calculateSellerReadinessScore } from '@/lib/scoring';
 import { SellerReadinessInput } from '@/lib/types';
 import { createClient } from '@/lib/supabase/browser';
 import { useTranslation } from '@/lib/i18n/LocaleContext';
+import { trackOnboardingStart } from '@/lib/analytics';
 
 const initialState: SellerReadinessInput = {
   businessName: '', sector: 'cafe', canton: 'ZH', foundedYear: 2015,
@@ -30,6 +31,7 @@ export default function SellerOnboardingPage() {
   }
 
   async function submit() {
+    trackOnboardingStart('seller');
     setSubmitting(true);
     const computed = calculateSellerReadinessScore(data);
     setScore(computed);

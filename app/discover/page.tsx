@@ -4,11 +4,13 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import Button from '@/components/Button';
 import SwipeCard from '@/components/SwipeCard';
+import LocationBanner from '@/components/LocationBanner';
 import { createClient } from '@/lib/supabase/browser';
 import { calculateSuccessionFitScore } from '@/lib/scoring';
 import { BuyerReadinessInput, Canton, Sector, SwipeAction } from '@/lib/types';
 import { SWIPES_PER_DAY as DAILY_LIMIT } from '@/lib/constants';
 import { useTranslation } from '@/lib/i18n/LocaleContext';
+import { trackSwipe } from '@/lib/analytics';
 
 interface CardData {
   id: string;
@@ -32,6 +34,10 @@ interface SavedBusiness {
   price_max: number;
 }
 
+const CANTON_LABELS: Partial<Record<Canton, string>> = {
+  ZH: 'Zürich', BE: 'Bern', AG: 'Aargau', ZG: 'Zug', VD: 'Vaud', GE: 'Genève', TI: 'Ticino',
+};
+
 export default function DiscoverPage() {
   const { t } = useTranslation();
   const [card, setCard] = useState<CardData | null>(null);
@@ -44,6 +50,8 @@ export default function DiscoverPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [savedBusinesses, setSavedBusinesses] = useState<SavedBusiness[]>([]);
   const [buyerProfile, setBuyerProfile] = useState<BuyerReadinessInput | null>(null);
+  const [showLocationBanner, setShowLocationBanner] = useState(false);
+  const [userCanton, setUserCanton] = useState<Canton | null>(null);
   const supabase = createClient();
 
   const getUserId = useCallback(async () => {
@@ -69,10 +77,12 @@ export default function DiscoverPage() {
     }
   }, [supabase]);
 
-  const fetchNextCard = useCallback(async () => {
+  const fetchNextCard = useCallback(async (canton?: Canton | null) => {
     setLoading(true);
     const userId = await getUserId();
-    const res = await fetch('/api/interactions/get-next-card', {
+    const url = new URL('/api/interactions/get-next-card', window.location.origin);
+    if (canton) url.searchParams.set('canton', canton);
+    const res = await fetch(url.toString(), {
       headers: { 'x-user-id': userId },
     });
     const json = await res.json();
@@ -129,6 +139,10 @@ export default function DiscoverPage() {
         } catch { setNoProfile(true); }
       }
 
+      // Check location banner
+      const dismissed = localStorage.getItem('location_banner_dismissed');
+      if (!dismissed) setShowLocationBanner(true);
+
       await fetchSaved(userId);
       await fetchNextCard();
     }
@@ -172,11 +186,12 @@ export default function DiscoverPage() {
     if (res.status === 429) { setLimitReached(true); setSwipesRemaining(0); return; }
     if (json.swipesRemaining !== undefined) setSwipesRemaining(json.swipesRemaining);
     if (json.limitReached) setLimitReached(true);
+    trackSwipe(action, card.id);
     if (action === 'like') setToast(t.discover.toastLike);
     else if (action === 'save') setToast(t.discover.toastSave);
     else setToast(t.discover.toastPass);
     if (action !== 'pass') fetchSaved(userId);
-    if (!json.limitReached) fetchNextCard();
+    if (!json.limitReached) fetchNextCard(userCanton);
   }
 
   if (loading) return (
@@ -196,6 +211,19 @@ export default function DiscoverPage() {
   return (
     <main className="min-h-screen px-4 py-12">
       <div className="max-w-lg mx-auto flex flex-col gap-8">
+        {showLocationBanner && (
+          <LocationBanner
+            onDetected={(canton) => {
+              setShowLocationBanner(false);
+              if (canton) {
+                setUserCanton(canton);
+                fetchNextCard(canton);
+              }
+            }}
+            onDismiss={() => setShowLocationBanner(false)}
+          />
+        )}
+
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-serif text-2xl font-bold">{t.discover.title}</h1>
@@ -203,7 +231,24 @@ export default function DiscoverPage() {
               {swipesRemaining} {swipesRemaining !== 1 ? t.discover.swipePlural : t.discover.swipeSingular}
             </p>
           </div>
-          <Link href="/" className="text-sm" style={{ color: '#4b5563' }}>{t.discover.back}</Link>
+          <div className="flex items-center gap-3">
+            {userCanton && (
+              <span
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium"
+                style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', color: '#34d399' }}
+              >
+                📍 {CANTON_LABELS[userCanton] ?? userCanton}
+                <button
+                  onClick={() => { setUserCanton(null); fetchNextCard(null); }}
+                  className="ml-1 leading-none"
+                  style={{ color: '#6b7280' }}
+                >
+                  ×
+                </button>
+              </span>
+            )}
+            <Link href="/" className="text-sm" style={{ color: '#4b5563' }}>{t.discover.back}</Link>
+          </div>
         </div>
 
         <div className="h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>

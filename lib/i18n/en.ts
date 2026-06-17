@@ -344,6 +344,13 @@ const en = {
       },
     ],
   },
+  location: {
+    bannerTitle: 'Enable location',
+    bannerDesc: 'Enable location to see businesses near you',
+    allow: 'Allow',
+    dismiss: 'Not now',
+    active: 'Active',
+  },
 };
 
 export default en;

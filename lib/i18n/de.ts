@@ -344,6 +344,13 @@ const de = {
       },
     ],
   },
+  location: {
+    bannerTitle: 'Standort aktivieren',
+    bannerDesc: 'Standort aktivieren um Unternehmen in Ihrer Nähe zu sehen',
+    allow: 'Erlauben',
+    dismiss: 'Jetzt nicht',
+    active: 'Aktiv',
+  },
 };
 
 export default de;

@@ -47,4 +47,11 @@ export interface Translations {
   };
   admin: { title: string; subtitle: string; pendingCount: (n: number) => string; noPending: string; noPendingDesc: string; revenue: (v: number) => string; submitted: (d: string) => string; reject: string; approve: string; loading: string; accessDenied: string; accessDeniedDesc: string };
   privacy: { navItems: { id: string; label: string; icon: string }[]; contactDpo: string; badge: string; title: string; subtitle: string; nLPD: string; GDPR: string };
+  location: {
+    bannerTitle: string;
+    bannerDesc: string;
+    allow: string;
+    dismiss: string;
+    active: string;
+  };
 }
