@@ -170,7 +170,7 @@ export default function WorkspacePage() {
 
               {/* Transaction summary */}
               <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 20, padding: 24, marginBottom: 24 }}>
-                <h2 style={{ fontSize: 16, fontWeight: 700, marginTop: 0, marginBottom: 20, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 1, fontSize: 12 }}>Transaktionszusammenfassung</h2>
+                <h2 style={{ fontSize: 12, fontWeight: 700, marginTop: 0, marginBottom: 20, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 1 }}>Transaktionszusammenfassung</h2>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16 }}>
                   {[
                     { label: 'Unternehmen', value: loading ? null : (business?.name ?? '—') },

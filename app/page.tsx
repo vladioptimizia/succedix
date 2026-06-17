@@ -252,6 +252,53 @@ export default function LandingPage() {
   );
 }
 
+const FEATURED_BUSINESSES = [
+  { name: 'Bäckerei Zentral', sector: 'Bäckerei', canton: 'ZH', price: 'CHF 180k – 240k' },
+  { name: 'Studio Beauté', sector: 'Beauty', canton: 'GE', price: 'CHF 95k – 130k' },
+  { name: 'IT-Service Boutique', sector: 'Technologie', canton: 'ZG', price: 'CHF 220k – 320k' },
+];
+
+function FeaturedBusinessCard({ name, sector, canton, price }: { name: string; sector: string; canton: string; price: string }) {
+  return (
+    <div className="rounded-2xl overflow-hidden flex flex-col" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="h-44" style={{ background: 'linear-gradient(135deg, #064e3b 0%, #1f2937 100%)' }} />
+      <div className="p-4 flex flex-col gap-2">
+        <span className="self-start text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', color: '#34d399' }}>{sector}</span>
+        <p className="font-semibold text-white">{name}</p>
+        <p className="text-xs" style={{ color: '#6b7280' }}>{canton}</p>
+        <p className="text-sm text-white">{price}</p>
+        <Link href="/discover" className="mt-2 text-center text-xs py-2 rounded-xl font-medium" style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', color: '#34d399' }}>
+          Details ansehen →
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+const CATEGORIES = [
+  { icon: '☕', label: 'Café & Gastronomie', count: 45 },
+  { icon: '🛍️', label: 'Detailhandel', count: 38 },
+  { icon: '🔧', label: 'Dienstleistungen', count: 52 },
+  { icon: '🏥', label: 'Gesundheit', count: 29 },
+  { icon: '✂️', label: 'Beauty & Wellness', count: 33 },
+  { icon: '🏗️', label: 'Handwerk', count: 41 },
+  { icon: '💻', label: 'Technologie', count: 18 },
+  { icon: '➕', label: 'Weitere', count: 60 },
+];
+
+function CategoryPill({ icon, label, count }: { icon: string; label: string; count: number }) {
+  return (
+    <Link href="/discover"
+      className="flex flex-col items-center gap-2 p-4 rounded-2xl text-center flex-shrink-0 snap-start transition-all hover:opacity-80"
+      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', minWidth: 120 }}
+    >
+      <span className="text-2xl">{icon}</span>
+      <span className="text-xs font-medium text-white leading-tight">{label}</span>
+      <span className="text-xs" style={{ color: '#4b5563' }}>+{count} Inserate</span>
+    </Link>
+  );
+}
+
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <div className="text-center">
