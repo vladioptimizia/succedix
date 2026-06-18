@@ -40,9 +40,7 @@ export default function LoginPage() {
         setLoading(false)
         return
       }
-      // Garante que o cliente do browser também tem a sessão sincronizada
-      router.push(json.redirect || '/discover')
-      router.refresh()
+      window.location.href = json.redirect || '/discover'
     } catch (err: any) {
       setError(err?.message || 'Erro inesperado ao entrar.')
       setLoading(false)
