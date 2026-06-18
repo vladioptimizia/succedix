@@ -11,7 +11,7 @@ export default function LandingPage() {
 
       {/* ─── HERO ─── */}
       <section
-        className="relative flex flex-col items-center text-center px-6 pt-28 pb-32 gap-8 overflow-hidden"
+        className="relative flex flex-col items-center text-center px-5 pt-20 sm:pt-28 pb-20 sm:pb-32 gap-6 sm:gap-8 overflow-hidden"
       >
         {/* Matterhorn hero background */}
         <div
@@ -35,13 +35,13 @@ export default function LandingPage() {
           {t.hero.badge}
         </span>
 
-        <h1 className="font-serif text-4xl md:text-7xl font-bold max-w-3xl leading-tight" style={{ letterSpacing: '-0.02em' }}>
+        <h1 className="font-serif text-3xl sm:text-5xl md:text-7xl font-bold max-w-3xl leading-tight" style={{ letterSpacing: '-0.02em' }}>
           {t.hero.headline1}
           <br />
           <span style={{ background: 'linear-gradient(135deg, #10b981, #34d399)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{t.hero.headline2}</span>
         </h1>
 
-        <p className="text-gray-400 max-w-xl text-lg leading-relaxed">
+        <p className="text-gray-400 max-w-xl text-base sm:text-lg leading-relaxed">
           {t.hero.subtext}
           <br />
           <span className="text-gray-300 font-medium">{t.hero.highlight}</span>
@@ -120,7 +120,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── 3 PILLARS ─── */}
-      <section className="px-6 py-24" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+      <section className="px-4 sm:px-6 py-14 sm:py-24" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
         <div className="max-w-5xl mx-auto">
           <p className="text-center text-xs tracking-widest uppercase text-gray-500 mb-3">{t.pillars.tag}</p>
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-center mb-4">{t.pillars.title}</h2>
@@ -152,11 +152,11 @@ export default function LandingPage() {
       </section>
 
       {/* ─── HOW IT WORKS ─── */}
-      <section id="wie-es-funktioniert" className="px-6 py-24" style={{ background: 'rgba(16,185,129,0.02)', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+      <section id="wie-es-funktioniert" className="px-4 sm:px-6 py-14 sm:py-24" style={{ background: 'rgba(16,185,129,0.02)', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div className="max-w-5xl mx-auto">
           <p className="text-center text-xs tracking-widest uppercase text-gray-500 mb-3">{t.process.tag}</p>
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-center mb-16">{t.process.title}</h2>
-          <div className="grid md:grid-cols-4 gap-4">
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-10 sm:mb-16">{t.process.title}</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             <StepCard number={t.process.s1.num} title={t.process.s1.title} description={t.process.s1.desc} />
             <StepCard number={t.process.s2.num} title={t.process.s2.title} description={t.process.s2.desc} />
             <StepCard number={t.process.s3.num} title={t.process.s3.title} description={t.process.s3.desc} />
@@ -166,8 +166,8 @@ export default function LandingPage() {
       </section>
 
       {/* ─── FOR WHOM ─── */}
-      <section className="px-6 py-20" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
+      <section className="px-4 sm:px-6 py-14 sm:py-20" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-4 sm:gap-6">
           <AudienceCard
             tag={t.sellers.tag}
             headline={t.sellers.title}
@@ -188,11 +188,29 @@ export default function LandingPage() {
       </section>
 
       {/* ─── COMPARISON TABLE ─── */}
-      <section className="px-6 py-20" style={{ background: 'rgba(16,185,129,0.02)', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+      <section className="px-4 sm:px-6 py-14 sm:py-20" style={{ background: 'rgba(16,185,129,0.02)', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div className="max-w-3xl mx-auto">
           <p className="text-center text-xs tracking-widest uppercase text-gray-500 mb-3">{t.comparison.tag}</p>
-          <h2 className="font-serif text-3xl font-bold text-center mb-12">{t.comparison.title}</h2>
-          <div className="overflow-x-auto rounded-2xl border border-gray-800">
+          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">{t.comparison.title}</h2>
+
+          {/* Mobile: card list */}
+          <div className="sm:hidden flex flex-col gap-3">
+            <div className="grid grid-cols-3 text-xs font-medium px-3 py-2" style={{ color: '#6b7280' }}>
+              <span>{t.comparison.col1}</span>
+              <span className="text-center">{t.comparison.col2}</span>
+              <span className="text-center" style={{ color: '#10b981' }}>{t.comparison.col3}</span>
+            </div>
+            {t.comparison.rows.map((row, i) => (
+              <div key={i} className="grid grid-cols-3 items-center px-3 py-3 rounded-xl gap-2" style={{ background: i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <span className="text-xs text-gray-300 leading-tight">{row.feature}</span>
+                <span className="text-xs text-center text-gray-500">{row.competitors}</span>
+                <span className="text-xs text-center font-semibold" style={{ color: '#10b981' }}>{row.us}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: table */}
+          <div className="hidden sm:block overflow-x-auto rounded-2xl border border-gray-800">
             <table className="w-full text-sm">
               <thead>
                 <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
@@ -203,11 +221,7 @@ export default function LandingPage() {
               </thead>
               <tbody>
                 {t.comparison.rows.map((row, i) => (
-                  <tr
-                    key={i}
-                    className="border-t border-gray-800"
-                    style={{ background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)' }}
-                  >
+                  <tr key={i} className="border-t border-gray-800" style={{ background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)' }}>
                     <td className="px-6 py-4 text-gray-300">{row.feature}</td>
                     <td className="px-6 py-4 text-center text-gray-500">{row.competitors}</td>
                     <td className="px-6 py-4 text-center font-semibold" style={{ color: '#10b981' }}>{row.us}</td>
@@ -220,8 +234,8 @@ export default function LandingPage() {
       </section>
 
       {/* ─── CTA FINAL ─── */}
-      <section className="px-6 py-24 flex flex-col items-center text-center gap-6" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <h2 className="font-serif text-3xl md:text-4xl font-bold max-w-xl">{t.cta.title}</h2>
+      <section className="px-4 sm:px-6 py-16 sm:py-24 flex flex-col items-center text-center gap-5 sm:gap-6" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold max-w-xl">{t.cta.title}</h2>
         <p className="text-gray-400 max-w-sm">{t.cta.subtitle}</p>
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
@@ -317,7 +331,7 @@ function PillarCard({
 }) {
   return (
     <div
-      className="p-8 rounded-2xl flex flex-col gap-4"
+      className="p-5 sm:p-8 rounded-2xl flex flex-col gap-3 sm:gap-4"
       style={{
         background: highlight ? 'rgba(16,185,129,0.06)' : 'rgba(255,255,255,0.02)',
         border: highlight ? '1px solid rgba(16,185,129,0.25)' : '1px solid rgba(255,255,255,0.06)',
@@ -370,7 +384,7 @@ function AudienceCard({
 }) {
   return (
     <div
-      className="p-8 rounded-2xl flex flex-col gap-5"
+      className="p-5 sm:p-8 rounded-2xl flex flex-col gap-4 sm:gap-5"
       style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}
     >
       <span className="text-xs tracking-widest uppercase" style={{ color: '#10b981' }}>{tag}</span>

@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ConsentProvider>
             <Analytics />
             <Header />
-            <div className="pt-16">{children}</div>
+            <div className="pt-14 sm:pt-16">{children}</div>
             <Footer />
           </ConsentProvider>
         </LocaleProvider>
