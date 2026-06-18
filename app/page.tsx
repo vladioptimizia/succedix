@@ -269,15 +269,36 @@ export default function LandingPage() {
 }
 
 const FEATURED_BUSINESSES = [
-  { name: 'Bäckerei Zentral', sector: 'Bäckerei', canton: 'ZH', price: 'CHF 180k – 240k' },
-  { name: 'Studio Beauté', sector: 'Beauty', canton: 'GE', price: 'CHF 95k – 130k' },
-  { name: 'IT-Service Boutique', sector: 'Technologie', canton: 'ZG', price: 'CHF 220k – 320k' },
+  {
+    name: 'Bäckerei Zentral',
+    sector: 'Bäckerei',
+    canton: 'ZH',
+    price: 'CHF 180k – 240k',
+    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=80&fit=crop',
+  },
+  {
+    name: 'Studio Beauté',
+    sector: 'Beauty',
+    canton: 'GE',
+    price: 'CHF 95k – 130k',
+    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80&fit=crop',
+  },
+  {
+    name: 'IT-Service Boutique',
+    sector: 'Technologie',
+    canton: 'ZG',
+    price: 'CHF 220k – 320k',
+    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80&fit=crop',
+  },
 ];
 
-function FeaturedBusinessCard({ name, sector, canton, price }: { name: string; sector: string; canton: string; price: string }) {
+function FeaturedBusinessCard({ name, sector, canton, price, image }: { name: string; sector: string; canton: string; price: string; image: string }) {
   return (
     <div className="rounded-2xl overflow-hidden flex flex-col" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-      <div className="h-44" style={{ background: 'linear-gradient(135deg, #064e3b 0%, #1f2937 100%)' }} />
+      <div className="h-44 relative overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={image} alt={name} className="w-full h-full object-cover" style={{ filter: 'brightness(0.85)' }} />
+      </div>
       <div className="p-4 flex flex-col gap-2">
         <span className="self-start text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', color: '#34d399' }}>{sector}</span>
         <p className="font-semibold text-white">{name}</p>
