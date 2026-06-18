@@ -92,14 +92,14 @@ export default function ImportQueuePage() {
   }
 
   if (loading) return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       <div className="h-8 w-56 rounded animate-pulse mb-8" style={{ background: 'rgba(255,255,255,0.06)' }} />
       {[1,2,3].map(i => <div key={i} className="h-16 rounded-xl animate-pulse mb-3" style={{ background: 'rgba(255,255,255,0.03)' }} />)}
     </div>
   )
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       <div className="mb-8">
         <p className="text-xs tracking-widest uppercase mb-1" style={{ color: '#4b5563' }}>Admin</p>
         <h1 className="font-serif text-3xl font-bold">Import Queue</h1>

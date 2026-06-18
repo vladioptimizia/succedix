@@ -83,14 +83,14 @@ export default function AdminOverviewPage() {
 
   if (loading) {
     return (
-      <div className="p-8">
-        <div className="mb-8">
+      <div className="p-4 sm:p-8">
+        <div className="mb-6 sm:mb-8">
           <div className="h-4 w-24 rounded animate-pulse mb-2" style={{ background: 'rgba(255,255,255,0.06)' }} />
           <div className="h-8 w-48 rounded animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           {[1,2,3,4].map(i => (
-            <div key={i} className="rounded-2xl p-6 animate-pulse" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', height: '120px' }} />
+            <div key={i} className="rounded-2xl p-4 sm:p-6 animate-pulse" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', height: '100px' }} />
           ))}
         </div>
         <div className="rounded-2xl animate-pulse" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', height: '300px' }} />
@@ -100,8 +100,8 @@ export default function AdminOverviewPage() {
 
   if (error) {
     return (
-      <div className="p-8">
-        <div className="rounded-2xl p-8" style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.1)' }}>
+      <div className="p-4 sm:p-8">
+        <div className="rounded-2xl p-6 sm:p-8" style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.1)' }}>
           <p className="text-sm" style={{ color: '#f87171' }}>Error loading dashboard: {error}</p>
         </div>
       </div>
@@ -109,17 +109,17 @@ export default function AdminOverviewPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       {/* Header */}
-      <div className="mb-8 flex items-start justify-between">
+      <div className="mb-6 sm:mb-8 flex items-start justify-between gap-3">
         <div>
           <p className="text-xs tracking-widest uppercase mb-1" style={{ color: '#4b5563' }}>Admin Panel</p>
-          <h1 className="font-serif text-3xl font-bold">Overview</h1>
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold">Overview</h1>
           <p className="mt-1 text-sm" style={{ color: '#6b7280' }}>Succedix platform dashboard</p>
         </div>
         <Link
           href="/admin/import-queue"
-          className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all hover:opacity-90"
+          className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all hover:opacity-90 whitespace-nowrap"
           style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', color: '#34d399' }}
         >
           Process Queue
@@ -127,15 +127,15 @@ export default function AdminOverviewPage() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
         {statCards.map((card) => (
           <div
             key={card.label}
-            className="rounded-2xl p-6"
+            className="rounded-2xl p-4 sm:p-6"
             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
           >
-            <p className="text-xs mb-3" style={{ color: '#6b7280' }}>{card.label}</p>
-            <p className="text-3xl font-bold" style={{ color: card.color }}>{card.value}</p>
+            <p className="text-xs mb-2 sm:mb-3" style={{ color: '#6b7280' }}>{card.label}</p>
+            <p className="text-2xl sm:text-3xl font-bold" style={{ color: card.color }}>{card.value}</p>
           </div>
         ))}
       </div>
@@ -145,36 +145,51 @@ export default function AdminOverviewPage() {
         className="rounded-2xl overflow-hidden"
         style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
       >
-        <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="px-4 sm:px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <h2 className="font-semibold text-sm">Recent Businesses</h2>
         </div>
         {recent.length === 0 ? (
-          <div className="p-12 text-center">
+          <div className="p-8 sm:p-12 text-center">
             <p className="text-sm" style={{ color: '#6b7280' }}>No businesses yet</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                  {['Name', 'Sector', 'Canton', 'Status', 'Created'].map(h => (
-                    <th key={h} className="text-left px-6 py-3 text-xs font-medium uppercase tracking-wider" style={{ color: '#4b5563' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {recent.map((b) => (
-                  <tr key={b.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                    <td className="px-6 py-3 text-sm font-medium">{b.name}</td>
-                    <td className="px-6 py-3 text-sm" style={{ color: '#6b7280' }}>{b.sector}</td>
-                    <td className="px-6 py-3 text-sm" style={{ color: '#6b7280' }}>{b.canton}</td>
-                    <td className="px-6 py-3"><StatusBadge status={b.status} /></td>
-                    <td className="px-6 py-3 text-sm" style={{ color: '#6b7280' }}>{new Date(b.created_at).toLocaleDateString('de-CH')}</td>
+          <>
+            {/* Mobile card list */}
+            <div className="sm:hidden divide-y" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
+              {recent.map((b) => (
+                <div key={b.id} className="px-4 py-3">
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <p className="text-sm font-medium leading-snug">{b.name}</p>
+                    <StatusBadge status={b.status} />
+                  </div>
+                  <p className="text-xs" style={{ color: '#6b7280' }}>{b.sector} · {b.canton} · {new Date(b.created_at).toLocaleDateString('de-CH')}</p>
+                </div>
+              ))}
+            </div>
+            {/* Desktop table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    {['Name', 'Sector', 'Canton', 'Status', 'Created'].map(h => (
+                      <th key={h} className="text-left px-6 py-3 text-xs font-medium uppercase tracking-wider" style={{ color: '#4b5563' }}>{h}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {recent.map((b) => (
+                    <tr key={b.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                      <td className="px-6 py-3 text-sm font-medium">{b.name}</td>
+                      <td className="px-6 py-3 text-sm" style={{ color: '#6b7280' }}>{b.sector}</td>
+                      <td className="px-6 py-3 text-sm" style={{ color: '#6b7280' }}>{b.canton}</td>
+                      <td className="px-6 py-3"><StatusBadge status={b.status} /></td>
+                      <td className="px-6 py-3 text-sm" style={{ color: '#6b7280' }}>{new Date(b.created_at).toLocaleDateString('de-CH')}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>
