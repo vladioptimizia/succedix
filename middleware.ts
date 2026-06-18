@@ -32,11 +32,11 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
 
-  if (user) {
+  if (session?.user) {
     const authedHeaders = new Headers(cleanHeaders)
-    authedHeaders.set('x-user-id', user.id)
+    authedHeaders.set('x-user-id', session.user.id)
     const response = NextResponse.next({ request: { headers: authedHeaders } })
     supabaseResponse.cookies.getAll().forEach(c => response.cookies.set(c.name, c.value))
     return response
