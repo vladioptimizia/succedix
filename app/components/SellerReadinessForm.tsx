@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { SECTOR_VALUES, SECTOR_LABELS_PT } from '@/lib/taxonomy';
 
 export function SellerReadinessForm({ userId }: { userId: string }) {
   const [formData, setFormData] = useState({
@@ -71,10 +72,9 @@ export function SellerReadinessForm({ userId }: { userId: string }) {
             className="w-full bg-gray-900 border border-gray-700 text-white p-3 rounded-lg focus:outline-none focus:border-green-500"
           >
             <option value="">-- Seleccione --</option>
-            <option value="cafe">Café</option>
-            <option value="restauracao">Restauração</option>
-            <option value="salao">Salão</option>
-            <option value="retail">Varejo</option>
+            {SECTOR_VALUES.map((val) => (
+              <option key={val} value={val}>{SECTOR_LABELS_PT[val]}</option>
+            ))}
           </select>
         </div>
 
