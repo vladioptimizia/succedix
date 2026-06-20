@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { calculateSellerReadinessScore } from '@/lib/scoring';
 import { z } from 'zod';
+import { SECTOR_VALUES, CANTON_VALUES } from '@/lib/taxonomy';
 
 export const dynamic = 'force-dynamic';
 
 const SellerReadinessSchema = z.object({
   businessName: z.string().min(1),
-  sector: z.enum(['cafe', 'restaurante', 'varejo', 'servicos', 'saude', 'outro']),
-  canton: z.enum(['ZH', 'BE', 'AG', 'ZG', 'VD', 'GE', 'TI', 'outro']),
+  sector: z.enum(SECTOR_VALUES),
+  canton: z.enum(CANTON_VALUES),
   foundedYear: z.number().int().min(1900).max(new Date().getFullYear()),
   annualRevenue: z.number().min(0),
   operatingMargin: z.number().min(0).max(100),
