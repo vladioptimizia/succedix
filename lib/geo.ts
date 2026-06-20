@@ -1,16 +1,35 @@
 import { Canton } from '@/lib/types';
 
+// A API Nominatim é chamada com Accept-Language: en, pelo que 'address.state'
+// vem tipicamente em inglês — mas incluímos também variantes DE/FR/IT por
+// segurança, caso a API devolva o nome local para algum cantão.
 const CANTON_MAP: Record<string, Canton> = {
-  'Zürich': 'ZH',
-  'Zurich': 'ZH',
-  'Bern': 'BE',
-  'Berne': 'BE',
   'Aargau': 'AG',
-  'Zug': 'ZG',
-  'Vaud': 'VD',
-  'Genève': 'GE',
-  'Geneva': 'GE',
+  'Appenzell Innerrhoden': 'AI', 'Appenzell Inner-Rhoden': 'AI',
+  'Appenzell Ausserrhoden': 'AR', 'Appenzell Outer-Rhoden': 'AR',
+  'Bern': 'BE', 'Berne': 'BE',
+  'Basel-Landschaft': 'BL', 'Basel-Country': 'BL',
+  'Basel-Stadt': 'BS', 'Basel-City': 'BS',
+  'Fribourg': 'FR', 'Freiburg': 'FR',
+  'Geneva': 'GE', 'Genève': 'GE', 'Genf': 'GE',
+  'Glarus': 'GL',
+  'Graubünden': 'GR', 'Grisons': 'GR', 'Grigioni': 'GR',
+  'Jura': 'JU',
+  'Lucerne': 'LU', 'Luzern': 'LU',
+  'Neuchâtel': 'NE', 'Neuenburg': 'NE',
+  'Nidwalden': 'NW',
+  'Obwalden': 'OW',
+  'St. Gallen': 'SG', 'St Gallen': 'SG', 'Saint Gallen': 'SG',
+  'Schaffhausen': 'SH',
+  'Solothurn': 'SO',
+  'Schwyz': 'SZ',
+  'Thurgau': 'TG',
   'Ticino': 'TI',
+  'Uri': 'UR',
+  'Vaud': 'VD',
+  'Valais': 'VS', 'Wallis': 'VS',
+  'Zug': 'ZG',
+  'Zürich': 'ZH', 'Zurich': 'ZH',
 };
 
 async function getUserCanton(): Promise<Canton | null> {

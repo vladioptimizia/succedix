@@ -1,20 +1,9 @@
-export type Sector =
-  | "cafe"
-  | "restaurante"
-  | "varejo"
-  | "servicos"
-  | "saude"
-  | "outro";
+import type { SectorValue, CantonValue } from "./taxonomy";
 
-export type Canton =
-  | "ZH"
-  | "BE"
-  | "AG"
-  | "ZG"
-  | "VD"
-  | "GE"
-  | "TI"
-  | "outro";
+// Sector e Canton derivam da fonte única de verdade em lib/taxonomy.ts.
+// Para adicionar um novo sector/cantão, editar APENAS lib/taxonomy.ts.
+export type Sector = SectorValue;
+export type Canton = CantonValue;
 
 export interface SellerReadinessInput {
   businessName: string;
