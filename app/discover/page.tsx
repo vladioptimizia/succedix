@@ -8,6 +8,7 @@ import LocationBanner from '@/components/LocationBanner';
 import { createClient } from '@/lib/supabase/browser';
 import { calculateSuccessionFitScore } from '@/lib/scoring';
 import { BuyerReadinessInput, Canton, Sector, SwipeAction } from '@/lib/types';
+import { SECTOR_VALUES, SECTOR_LABELS_PT, CANTON_VALUES, CANTON_LABELS_DE } from '@/lib/taxonomy';
 import { SWIPES_PER_DAY as DAILY_LIMIT } from '@/lib/constants';
 import { useTranslation } from '@/lib/i18n/LocaleContext';
 import { trackSwipe } from '@/lib/analytics';
@@ -65,12 +66,10 @@ type ViewMode = 'grid' | 'list';
 
 /* ─────────────────────────── constants ─────────────────────────── */
 
-const CANTON_LABELS: Partial<Record<Canton, string>> = {
-  ZH: 'Zürich', BE: 'Bern', AG: 'Aargau', ZG: 'Zug', VD: 'Vaud', GE: 'Genève', TI: 'Ticino',
-};
+const CANTON_LABELS = CANTON_LABELS_DE;
 
-const ALL_CANTONS = ['ZH', 'BE', 'AG', 'ZG', 'VD', 'GE', 'TI', 'LU', 'SG', 'BS'];
-const ALL_SECTORS = ['Café', 'Restaurant', 'Retail', 'Services', 'Healthcare', 'Other'];
+const ALL_CANTONS: string[] = CANTON_VALUES.filter((c) => c !== 'outro');
+const ALL_SECTORS: string[] = SECTOR_VALUES.filter((s) => s !== 'outro');
 
 const DEFAULT_FILTERS: DesktopFilters = {
   cantons: [],
@@ -621,7 +620,7 @@ export default function DiscoverPage() {
                     className="w-3.5 h-3.5 accent-emerald-500 rounded"
                   />
                   <span className="text-sm" style={{ color: filters.sectors.includes(s) ? '#10b981' : '#6b7280' }}>
-                    {s}
+                    {SECTOR_LABELS_PT[s as Sector] ?? s}
                   </span>
                 </label>
               ))}
