@@ -9,8 +9,7 @@ import { BuyerReadinessInput, Sector } from '@/lib/types'
 import { createClient } from '@/lib/supabase/browser'
 import { useTranslation } from '@/lib/i18n/LocaleContext'
 import { trackOnboardingStart } from '@/lib/analytics'
-
-const SECTOR_VALUES: Sector[] = ['cafe', 'restaurante', 'varejo', 'servicos', 'saude', 'outro']
+import { SECTOR_VALUES, CANTON_VALUES } from '@/lib/taxonomy'
 
 const initialState: BuyerReadinessInput = {
   capitalMin: 0, capitalMax: 0, capitalSource: 'proprio',
@@ -179,7 +178,7 @@ export default function BuyerOnboardingPage() {
             <>
               <Field label={t.buyerOnboarding.fields.canton}>
                 <select className="input" value={data.regionMain} onChange={e => update('regionMain', e.target.value as any)}>
-                  {['ZH','BE','AG','ZG','VD','GE','TI','outro'].map(c => <option key={c} value={c}>{c}</option>)}
+                  {CANTON_VALUES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </Field>
               <Field label={`${t.buyerOnboarding.fields.radius}: ${data.radiusKm} km`}>
