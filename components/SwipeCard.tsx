@@ -1,23 +1,6 @@
 import { Business } from "@/lib/types";
 import { scoreStatus } from "@/lib/scoring";
-
-const sectorLabel: Record<string, string> = {
-  cafe: "Café",
-  restaurante: "Restaurante",
-  varejo: "Varejo",
-  servicos: "Serviços",
-  saude: "Saúde",
-  outro: "Outro",
-};
-
-const sectorIcon: Record<string, string> = {
-  cafe: "☕",
-  restaurante: "🍽️",
-  varejo: "🛍️",
-  servicos: "⚙️",
-  saude: "🏥",
-  outro: "🏢",
-};
+import { SECTOR_LABELS_PT as sectorLabel, SECTOR_ICONS as sectorIcon } from "@/lib/taxonomy";
 
 export default function SwipeCard({ business, fitScore }: { business: Business; fitScore: number }) {
   const { color } = scoreStatus(fitScore);
@@ -45,7 +28,7 @@ export default function SwipeCard({ business, fitScore }: { business: Business; 
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold leading-tight">{business.name}</h2>
-            <p className="text-sm mt-0.5" style={{ color: '#6b7280' }}>{sectorLabel[business.sector]}</p>
+            <p className="text-sm mt-0.5" style={{ color: '#6b7280' }}>{sectorLabel[business.sector] ?? "Outro"}</p>
           </div>
           {/* Fit Score badge */}
           <div
@@ -67,7 +50,7 @@ export default function SwipeCard({ business, fitScore }: { business: Business; 
           <Detail label="Preço mín." value={`CHF ${(business.priceMin / 1000).toFixed(0)}k`} />
           <Detail label="Preço máx." value={`CHF ${(business.priceMax / 1000).toFixed(0)}k`} />
           <Detail label="Fundado em" value={`${business.establishedYear}`} />
-          <Detail label="Sector" value={sectorLabel[business.sector]} />
+          <Detail label="Sector" value={sectorLabel[business.sector] ?? "Outro"} />
         </div>
 
         {/* Tags */}
