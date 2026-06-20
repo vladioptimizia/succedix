@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/browser';
+import { SECTOR_VALUES, SECTOR_LABELS_PT, SECTOR_ICONS, CANTON_VALUES } from '@/lib/taxonomy';
 
 interface Business {
   id: string;
@@ -17,8 +18,10 @@ interface Business {
   status: string;
 }
 
-const ALL_SECTORS = ['Café', 'Restaurant', 'Retail', 'Services', 'Healthcare', 'Other'];
-const ALL_CANTONS = ['ZH', 'BE', 'AG', 'ZG', 'VD', 'GE', 'TI', 'LU', 'SG', 'BS'];
+const ALL_SECTORS: string[] = SECTOR_VALUES.filter((s) => s !== 'outro');
+const ALL_CANTONS: string[] = CANTON_VALUES.filter((c) => c !== 'outro');
+const sectorLabel = SECTOR_LABELS_PT as Record<string, string>;
+const sectorIcon = SECTOR_ICONS as Record<string, string>;
 
 function fmtK(n: number) {
   return `CHF ${Math.round(n / 1000)}k`;
@@ -148,7 +151,7 @@ export default function MatchesPage() {
                         border: sectors.includes(s) ? '1px solid rgba(16,185,129,0.4)' : '1px solid rgba(255,255,255,0.08)',
                         color: sectors.includes(s) ? '#34d399' : '#6b7280',
                       }}
-                    >{s}</button>
+                    >{sectorLabel[s] ?? s}</button>
                   ))}
                 </div>
               </div>
@@ -212,7 +215,7 @@ export default function MatchesPage() {
                       {/* Icon */}
                       <div className="w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center text-2xl"
                         style={{ background: 'linear-gradient(135deg, #064e3b, #1f2937)' }}>
-                        {b.sector === 'Café' ? '☕' : b.sector === 'Restaurant' ? '🍽️' : b.sector === 'Retail' ? '🛍️' : b.sector === 'Healthcare' ? '🏥' : '🏢'}
+                        {sectorIcon[b.sector] ?? '🏢'}
                       </div>
 
                       {/* Info */}
@@ -220,7 +223,7 @@ export default function MatchesPage() {
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-xs px-2 py-0.5 rounded-full"
                             style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', color: '#34d399' }}>
-                            {b.sector}
+                            {sectorLabel[b.sector] ?? b.sector}
                           </span>
                         </div>
                         <p className="font-semibold text-white truncate">{b.name}</p>
