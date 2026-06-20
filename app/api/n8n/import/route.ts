@@ -1,35 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { guessSector, guessCanton } from '@/lib/taxonomy'
 
 export const dynamic = 'force-dynamic'
 
-// Map source site names to internal sector values
-function guessSector(text: string): string {
-  const t = text.toLowerCase()
-  if (t.includes('café') || t.includes('cafe') || t.includes('kaffee') || t.includes('bakery') || t.includes('bäckerei')) return 'cafe'
-  if (t.includes('restaurant') || t.includes('gastro') || t.includes('pizz') || t.includes('bistro')) return 'restaurante'
-  if (t.includes('shop') || t.includes('handel') || t.includes('retail') || t.includes('boutique')) return 'varejo'
-  if (t.includes('arzt') || t.includes('medizin') || t.includes('health') || t.includes('pflege') || t.includes('dental')) return 'saude'
-  if (t.includes('service') || t.includes('beratung') || t.includes('consulting') || t.includes('agentur')) return 'servicos'
-  return 'outro'
+// Tenta classificar primeiro a partir do campo estruturado (sector/canton vindo do
+// site de origem); só recorre a nome+descrição (ou cidade) como segunda tentativa
+// se a primeira não encontrar nenhuma correspondência conhecida.
+function resolveSector(b: { sector?: string; name: string; description?: string }): string {
+  if (b.sector) {
+    const fromSector = guessSector(b.sector)
+    if (fromSector !== 'outro') return fromSector
+  }
+  return guessSector(`${b.sector ?? ''} ${b.name} ${b.description ?? ''}`)
 }
 
-function guessCanton(text: string): string {
-  const cantons: Record<string, string> = {
-    'zürich': 'ZH', 'zurich': 'ZH', 'zh': 'ZH',
-    'bern': 'BE', 'berne': 'BE', 'be': 'BE',
-    'aargau': 'AG', 'aarau': 'AG', 'ag': 'AG',
-    'zug': 'ZG', 'zg': 'ZG',
-    'vaud': 'VD', 'lausanne': 'VD', 'vd': 'VD',
-    'genève': 'GE', 'geneva': 'GE', 'genf': 'GE', 'ge': 'GE',
-    'ticino': 'TI', 'lugano': 'TI', 'ti': 'TI',
+function resolveCanton(b: { canton?: string; city?: string }): string {
+  if (b.canton) {
+    const fromCanton = guessCanton(b.canton)
+    if (fromCanton !== 'outro') return fromCanton
   }
-  const t = text.toLowerCase()
-  for (const [key, val] of Object.entries(cantons)) {
-    if (t.includes(key)) return val
-  }
-  return 'outro'
+  return guessCanton(`${b.canton ?? ''} ${b.city ?? ''}`)
 }
 
 const BusinessSchema = z.object({
@@ -88,13 +80,8 @@ export async function POST(req: NextRequest) {
       continue
     }
 
-    const sectorResolved = b.sector
-      ? guessSector(b.sector)
-      : guessSector(b.name + ' ' + (b.description ?? ''))
-
-    const cantonResolved = b.canton
-      ? guessCanton(b.canton)
-      : guessCanton(b.city ?? '')
+    const sectorResolved = resolveSector(b)
+    const cantonResolved = resolveCanton(b)
 
     const { error } = await supabase.from('businesses').insert({
       name: b.name,
