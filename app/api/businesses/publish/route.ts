@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { z } from 'zod';
+import { SECTOR_VALUES, CANTON_VALUES } from '@/lib/taxonomy';
 
 export const dynamic = 'force-dynamic';
 
 const PublishSchema = z.object({
   name: z.string().min(1),
-  sector: z.enum(['cafe', 'restaurante', 'varejo', 'servicos', 'saude', 'outro']),
-  canton: z.enum(['ZH', 'BE', 'AG', 'ZG', 'VD', 'GE', 'TI', 'outro']),
+  sector: z.enum(SECTOR_VALUES),
+  canton: z.enum(CANTON_VALUES),
   city: z.string().optional(),
   description: z.string().optional(),
   priceMin: z.number().min(0),
