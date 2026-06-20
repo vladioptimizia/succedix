@@ -8,6 +8,7 @@ import { SellerReadinessInput } from '@/lib/types';
 import { createClient } from '@/lib/supabase/browser';
 import { useTranslation } from '@/lib/i18n/LocaleContext';
 import { trackOnboardingStart } from '@/lib/analytics';
+import { SECTOR_VALUES, CANTON_VALUES } from '@/lib/taxonomy';
 
 const initialState: SellerReadinessInput = {
   businessName: '', sector: 'cafe', canton: 'ZH', foundedYear: 2015,
@@ -144,14 +145,14 @@ export default function SellerOnboardingPage() {
               </Field>
               <Field label={t.sellerOnboarding.fields.sector}>
                 <select className="input" value={data.sector} onChange={e => update('sector', e.target.value as any)}>
-                  {(['cafe','restaurante','varejo','servicos','saude','outro'] as const).map((val, idx) => (
+                  {SECTOR_VALUES.map((val, idx) => (
                     <option key={val} value={val}>{t.sellerOnboarding.fields.sectors[idx]}</option>
                   ))}
                 </select>
               </Field>
               <Field label={t.sellerOnboarding.fields.canton}>
                 <select className="input" value={data.canton} onChange={e => update('canton', e.target.value as any)}>
-                  {['ZH','BE','AG','ZG','VD','GE','TI','outro'].map(c => <option key={c} value={c}>{c}</option>)}
+                  {CANTON_VALUES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </Field>
               <Field label={t.sellerOnboarding.fields.foundedYear}>
