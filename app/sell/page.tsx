@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation'
 import Button from '@/components/Button'
 import { createClient } from '@/lib/supabase/browser'
 import { useTranslation } from '@/lib/i18n/LocaleContext'
-
-const SECTOR_VALUES = ['cafe', 'restaurante', 'varejo', 'servicos', 'saude', 'outro']
+import { SECTOR_VALUES, CANTON_VALUES } from '@/lib/taxonomy'
 
 interface FormData {
   name: string
@@ -158,7 +157,7 @@ export default function SellPage() {
             <>
               <Field label={t.sell.fields.canton}>
                 <select className="input" value={data.canton} onChange={e => update('canton', e.target.value)}>
-                  {['ZH','BE','AG','ZG','VD','GE','TI','outro'].map(c => <option key={c} value={c}>{c}</option>)}
+                  {CANTON_VALUES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </Field>
               <Field label={t.sell.fields.city}>
