@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { calculateBuyerReadinessScore } from '@/lib/scoring';
 import { z } from 'zod';
+import { SECTOR_VALUES, CANTON_VALUES } from '@/lib/taxonomy';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,9 +10,9 @@ const BuyerReadinessSchema = z.object({
   capitalMin: z.number().min(0),
   capitalMax: z.number().min(0),
   capitalSource: z.enum(['proprio', 'credito', 'combinado', 'investor']),
-  sectorsInterested: z.array(z.enum(['cafe', 'restaurante', 'varejo', 'servicos', 'saude', 'outro'])),
+  sectorsInterested: z.array(z.enum(SECTOR_VALUES)),
   openToOtherSectors: z.boolean(),
-  regionMain: z.enum(['ZH', 'BE', 'AG', 'ZG', 'VD', 'GE', 'TI', 'outro']),
+  regionMain: z.enum(CANTON_VALUES),
   radiusKm: z.number().min(0),
   exploreOtherRegions: z.boolean(),
   involvementType: z.enum(['operator', 'investor', 'unknown']),
