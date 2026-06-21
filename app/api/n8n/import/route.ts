@@ -25,8 +25,8 @@ function resolveCanton(b: { canton?: string; city?: string }): string {
 }
 
 const BusinessSchema = z.object({
-  source: z.string(),          // "companymarket.ch", "firmenkauf.de", etc.
-  source_id: z.string(),       // original listing ID from source site
+  source: z.string(),           // "companymarket.ch", "firmenkauf.de", etc.
+  source_id: z.string(),         // original listing ID from source site
   source_url: z.string().url().optional(),
   name: z.string().min(1),
   description: z.string().optional(),
@@ -38,6 +38,7 @@ const BusinessSchema = z.object({
   annual_revenue: z.number().optional(),
   established_year: z.number().optional(),
   employees: z.number().optional(),
+  photos: z.array(z.string().url()).optional(),
 })
 
 const PayloadSchema = z.object({
@@ -64,10 +65,10 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = createAdminClient()
-  const results = { inserted: 0, skipped: 0, errors: 0 }
+  const results = { inserted: 0, updated: 0, errors: 0 }
 
   for (const b of parsed.data.businesses) {
-    // Skip duplicates — same source + source_id
+    // Já existe? mesmo source + source_id — atualiza em vez de saltar
     const { data: existing } = await supabase
       .from('businesses')
       .select('id')
@@ -75,15 +76,12 @@ export async function POST(req: NextRequest) {
       .eq('source_id', b.source_id)
       .maybeSingle()
 
-    if (existing) {
-      results.skipped++
-      continue
-    }
-
     const sectorResolved = resolveSector(b)
     const cantonResolved = resolveCanton(b)
 
-    const { error } = await supabase.from('businesses').insert({
+    // Campos vindos do scraper. "status" nunca é tocado aqui — é estado do
+    // funil/workflow interno e não deve ser revertido por um re-scrape.
+    const scrapedFields: Record<string, unknown> = {
       name: b.name,
       description: b.description ?? null,
       sector: sectorResolved,
@@ -94,11 +92,32 @@ export async function POST(req: NextRequest) {
       annual_revenue: b.annual_revenue ?? null,
       established_year: b.established_year ?? null,
       employees: b.employees ?? null,
+      source_url: b.source_url ?? null,
+    }
+    if (b.photos !== undefined) {
+      scrapedFields.photos = b.photos
+    }
+
+    if (existing) {
+      const { error } = await supabase
+        .from('businesses')
+        .update(scrapedFields)
+        .eq('id', existing.id)
+
+      if (error) {
+        results.errors++
+      } else {
+        results.updated++
+      }
+      continue
+    }
+
+    const { error } = await supabase.from('businesses').insert({
+      ...scrapedFields,
       source: b.source,
       source_id: b.source_id,
-      source_url: b.source_url ?? null,
       status: 'imported',
-      photos: [],
+      photos: b.photos ?? [],
     })
 
     if (error) {
@@ -111,7 +130,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     success: true,
     inserted: results.inserted,
-    skipped: results.skipped,
+    updated: results.updated,
     errors: results.errors,
   })
 }
