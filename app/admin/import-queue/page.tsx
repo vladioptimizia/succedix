@@ -77,6 +77,13 @@ export default function ImportQueuePage() {
     await load()
   }
 
+  async function approveAll() {
+    if (!confirm(`Approve all ${businesses.length} businesses in queue?`)) return
+    const supabase = createClient()
+    await supabase.from('businesses').update({ status: 'approved' }).in('status', ['imported', 'pending_review'])
+    await load()
+  }
+
   const filtered = businesses.filter(b => {
     if (statusFilter !== 'all' && b.status !== statusFilter) return false
     if (search && !b.name.toLowerCase().includes(search.toLowerCase())) return false
@@ -100,10 +107,19 @@ export default function ImportQueuePage() {
 
   return (
     <div className="p-4 sm:p-8">
-      <div className="mb-8">
-        <p className="text-xs tracking-widest uppercase mb-1" style={{ color: '#4b5563' }}>Admin</p>
-        <h1 className="font-serif text-3xl font-bold">Import Queue</h1>
-        <p className="mt-1 text-sm" style={{ color: '#6b7280' }}>{filtered.length} businesses in queue</p>
+      <div className="mb-8 flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs tracking-widest uppercase mb-1" style={{ color: '#4b5563' }}>Admin</p>
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold">Import Queue</h1>
+          <p className="mt-1 text-sm" style={{ color: '#6b7280' }}>{filtered.length} businesses in queue</p>
+        </div>
+        <button
+          onClick={approveAll}
+          className="flex-shrink-0 px-3 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all hover:opacity-90"
+          style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', color: '#34d399' }}
+        >
+          Approve All
+        </button>
       </div>
 
       {/* Info banner */}
