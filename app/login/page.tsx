@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/browser'
 import { useTranslation } from '@/lib/i18n/LocaleContext'
@@ -9,7 +8,6 @@ import { useTranslation } from '@/lib/i18n/LocaleContext'
 type Tab = 'login' | 'signup'
 
 export default function LoginPage() {
-  const router = useRouter()
   const { t } = useTranslation()
   const [tab, setTab] = useState<Tab>('login')
   const [email, setEmail] = useState('')
@@ -26,66 +24,56 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    try {
-      // Login via servidor (browser -> nosso servidor -> Supabase). Mais fiável
-      // do que o browser ligar diretamente ao Supabase.
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
-      const json = await res.json()
-      if (!res.ok) {
-        setError(json.error || 'Falha no login')
-        setLoading(false)
-        return
-      }
-      window.location.href = json.redirect || '/discover'
-    } catch (err: any) {
-      setError(err?.message || 'Erro inesperado ao entrar.')
+
+    const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
+
+    if (authError || !data.user) {
+      setError(authError?.message || 'Falha no login')
       setLoading(false)
+      return
     }
+
+    const isAdmin = data.user.email === 'vladimir.m.f95@gmail.com'
+    const ut = data.user.user_metadata?.user_type
+    const redirect = isAdmin
+      ? '/admin'
+      : ut === 'vendor'
+        ? '/onboarding/seller'
+        : ut === 'buyer'
+          ? '/onboarding/buyer'
+          : '/discover'
+
+    window.location.href = redirect
   }
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    try {
-      const timeout = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Timeout — o Supabase não respondeu em 12s. Verifica se o projeto está ativo (não pausado).')), 12000)
-      )
-      const { data: authData, error: signupError } = await Promise.race([
-        supabase.auth.signUp({
-          email,
-          password,
-          options: { data: { full_name: fullName, user_type: userType } },
-        }),
-        timeout,
-      ])
 
-      if (signupError) {
-        setError(signupError.message)
-        setLoading(false)
-        return
-      }
+    const { data: authData, error: signupError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName, user_type: userType } },
+    })
 
-      if (authData.user) {
-        await supabase.from('users').upsert({
-          id: authData.user.id,
-          email,
-          user_type: userType,
-          full_name: fullName || null,
-        })
-        setSuccess('Conta criada! A redirecionar...')
-        router.push(userType === 'buyer' ? '/onboarding/buyer' : '/onboarding/seller')
-        router.refresh()
-      } else {
-        setError('Sem dados de utilizador na resposta. Verifica a confirmação de email no Supabase.')
-        setLoading(false)
-      }
-    } catch (err: any) {
-      setError(err?.message || 'Erro inesperado ao criar conta.')
+    if (signupError) {
+      setError(signupError.message)
+      setLoading(false)
+      return
+    }
+
+    if (authData.user) {
+      await supabase.from('users').upsert({
+        id: authData.user.id,
+        email,
+        user_type: userType,
+        full_name: fullName || null,
+      })
+      setSuccess('Conta criada! A redirecionar...')
+      window.location.href = userType === 'buyer' ? '/onboarding/buyer' : '/onboarding/seller'
+    } else {
+      setError('Verifica a confirmação de email no Supabase.')
       setLoading(false)
     }
   }
