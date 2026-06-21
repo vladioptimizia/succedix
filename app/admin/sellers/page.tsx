@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/browser'
 
 interface Seller {
   id: string
@@ -22,48 +21,10 @@ export default function SellersPage() {
   useEffect(() => {
     async function load() {
       try {
-        const supabase = createClient()
-
-        const { data: users, error: usersErr } = await supabase
-          .from('users')
-          .select('id,email,full_name,user_type,created_at')
-          .in('user_type', ['seller', 'vendor'])
-          .order('created_at', { ascending: false })
-
-        if (usersErr) throw usersErr
-
-        const userList = (users ?? []) as Seller[]
-
-        // Enrich with business counts and canton — wrap each in try/catch
-        const enriched = await Promise.all(userList.map(async (u) => {
-          let business_count = 0
-          let canton: string | null = null
-
-          try {
-            const { count } = await supabase
-              .from('businesses')
-              .select('id', { count: 'exact', head: true })
-              .eq('vendor_id', u.id)
-            business_count = count ?? 0
-          } catch {
-            // ignore
-          }
-
-          try {
-            const { data: profile } = await supabase
-              .from('seller_profiles')
-              .select('canton')
-              .eq('user_id', u.id)
-              .maybeSingle()
-            canton = (profile as { canton?: string } | null)?.canton ?? null
-          } catch {
-            // table may not exist
-          }
-
-          return { ...u, business_count, canton }
-        }))
-
-        setSellers(enriched)
+        const res = await fetch('/api/admin/users?type=sellers')
+        const json = await res.json()
+        if (!res.ok) throw new Error(json.error || 'Unknown error')
+        setSellers(json.data ?? [])
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Unknown error')
       } finally {

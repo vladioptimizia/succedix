@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/browser'
 
 interface Buyer {
   id: string
@@ -35,37 +34,10 @@ export default function BuyersPage() {
   useEffect(() => {
     async function load() {
       try {
-        const supabase = createClient()
-
-        const { data: users, error: usersErr } = await supabase
-          .from('users')
-          .select('id,email,full_name,created_at')
-          .eq('user_type', 'buyer')
-          .order('created_at', { ascending: false })
-
-        if (usersErr) throw usersErr
-
-        const userList = (users ?? []) as Buyer[]
-
-        const enriched = await Promise.all(userList.map(async (u) => {
-          try {
-            const { data: profile } = await supabase
-              .from('buyer_profiles')
-              .select('capital_min,capital_max,readiness_score')
-              .eq('user_id', u.id)
-              .maybeSingle()
-
-            if (profile) {
-              const p = profile as { capital_min?: number; capital_max?: number; readiness_score?: number }
-              return { ...u, capital_min: p.capital_min ?? null, capital_max: p.capital_max ?? null, readiness_score: p.readiness_score ?? null }
-            }
-          } catch {
-            // buyer_profiles may not exist
-          }
-          return { ...u, capital_min: null, capital_max: null, readiness_score: null }
-        }))
-
-        setBuyers(enriched)
+        const res = await fetch('/api/admin/users?type=buyers')
+        const json = await res.json()
+        if (!res.ok) throw new Error(json.error || 'Unknown error')
+        setBuyers(json.data ?? [])
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Unknown error')
       } finally {

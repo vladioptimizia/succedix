@@ -380,7 +380,7 @@ export default function DiscoverPage() {
   useEffect(() => {
     async function init() {
       const userId = await getUserId();
-      if (!userId) return;
+      if (!userId) { setLoading(false); return; }
 
       const { data: profile } = await supabase
         .from('buyer_profiles')
