@@ -12,6 +12,7 @@ import { SECTOR_VALUES, SECTOR_LABELS_PT, CANTON_VALUES, CANTON_LABELS_DE } from
 import { SWIPES_PER_DAY as DAILY_LIMIT } from '@/lib/constants';
 import { useTranslation } from '@/lib/i18n/LocaleContext';
 import { trackSwipe } from '@/lib/analytics';
+import { getBusinessPhoto } from '@/lib/sector-photos';
 
 /* ─────────────────────────── types ─────────────────────────── */
 
@@ -140,12 +141,13 @@ function GridCard({ business: b, fitScore }: GridCardProps) {
         borderRadius: 16,
       }}
     >
-      {/* image placeholder */}
-      <div
-        className="h-40 flex-shrink-0"
-        style={{
-          background: 'linear-gradient(135deg, #064e3b 0%, #1f2937 100%)',
-        }}
+      {/* business photo */}
+      <img
+        src={getBusinessPhoto(b.photos, b.sector)}
+        alt={b.name}
+        className="h-40 w-full flex-shrink-0 object-cover"
+        style={{ borderRadius: '16px 16px 0 0' }}
+        onError={e => { (e.target as HTMLImageElement).src = getBusinessPhoto(null, b.sector) }}
       />
       <div className="p-4 flex flex-col gap-2 flex-1">
         {/* sector badge */}
