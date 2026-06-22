@@ -15,7 +15,7 @@ interface Business {
   created_at: string
   description?: string | null
   employees?: number | null
-  founded_year?: number | null
+  established_year?: number | null
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -51,7 +51,7 @@ export default function OpportunitiesPage() {
         const supabase = createClient()
         const { data, error: err } = await supabase
           .from('businesses')
-          .select('id,name,sector,canton,status,price_min,price_max,annual_revenue,created_at,description,employees,founded_year')
+          .select('id,name,sector,canton,status,price_min,price_max,annual_revenue,created_at,description,employees,established_year')
           .order('created_at', { ascending: false })
         if (err) throw err
         setBusinesses((data ?? []) as Business[])
@@ -150,7 +150,7 @@ export default function OpportunitiesPage() {
                             <p className="text-xs uppercase tracking-wider mb-4" style={{ color: '#4b5563' }}>Business Details</p>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
                               <div><p className="text-xs mb-1" style={{ color: '#4b5563' }}>Employees</p><p>{b.employees ?? '-'}</p></div>
-                              <div><p className="text-xs mb-1" style={{ color: '#4b5563' }}>Founded</p><p>{b.founded_year ?? '-'}</p></div>
+                              <div><p className="text-xs mb-1" style={{ color: '#4b5563' }}>Founded</p><p>{b.established_year ?? '-'}</p></div>
                               <div><p className="text-xs mb-1" style={{ color: '#4b5563' }}>ID</p><p className="text-xs font-mono" style={{ color: '#6b7280' }}>{b.id}</p></div>
                             </div>
                             {b.description && (
