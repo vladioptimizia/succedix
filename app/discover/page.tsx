@@ -546,13 +546,6 @@ export default function DiscoverPage() {
     </div>
   );
 
-  if (noProfile) return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-6 text-center" style={{ background: '#080808' }}>
-      <h2 className="font-serif text-2xl font-bold">{t.discover.noProfileTitle}</h2>
-      <p className="text-sm" style={{ color: '#6b7280' }}>{t.discover.noProfileDesc}</p>
-      <Link href="/onboarding/buyer"><Button variant="primary">{t.discover.noProfileCta}</Button></Link>
-    </div>
-  );
 
   /* ─────────── render ─────────── */
 

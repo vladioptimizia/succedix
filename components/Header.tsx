@@ -33,17 +33,10 @@ export default function Header() {
             </div>
             <Link href="/login" className="text-sm text-gray-300 hover:text-white transition-colors px-4 h-9 flex items-center">{t.nav.login}</Link>
             <Link href="/login" className="text-sm font-medium h-9 px-5 rounded-full flex items-center transition-colors" style={{ background: '#10b981', color: '#fff' }}>{t.nav.signup}</Link>
-            <Link href="/admin" className="text-sm font-medium h-9 px-4 rounded-full flex items-center gap-1.5 transition-colors" style={{ background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.4)', color: '#a5b4fc' }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 8v4l3 3"/></svg>
-              Admin
-            </Link>
           </div>
 
           {/* Mobile right */}
           <div className="flex md:hidden items-center gap-2">
-            <Link href="/admin" className="text-xs font-medium h-8 px-3 rounded-full flex items-center gap-1 transition-colors" style={{ background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.4)', color: '#a5b4fc' }}>
-              Admin
-            </Link>
             <button
               onClick={() => setOpen(!open)}
               className="w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-xl"
